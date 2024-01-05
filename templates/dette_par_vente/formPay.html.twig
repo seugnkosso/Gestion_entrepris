@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %} {% block title %}Dette Pay{% endblock %} {% block
+content %}
+<div class="mb-3 text-2xl">payement de Dette</div>
+<div class="mb-3 text-2xl text-red-600">{{error['erreurMontant']??""}}</div>
+
+<p class="text-base text-red-500">{{succes['paySucces']??""}}</p>
+
+{{ form_start(form) }}
+<div class="">
+  <div class="p-2 text-2xl ">client : <span class="text-yellow-600 text-bold">{{due.client}}</span></div>
+  <div class="p-2 text-2xl ">libelle : <span class="text-yellow-600 text-bold">{{due.libelle}}</span></div>
+  <div class="p-2 text-2xl ">date : <span class="text-yellow-600 text-bold">{{due.creatAt.format("Y-m-d")}}</span></div>
+  <div class="p-2 text-2xl ">montant total : <span class="text-yellow-600 text-bold">{{due.montantTotal}}fr</span></div>
+  <div class="p-2 text-2xl ">montant restant : <span class="text-yellow-600 text-bold">{{due.montantRestant}}fr</span></div>
+  <div class="p-2 text-2xl ">montant donnee : <span class="text-yellow-600 text-bold">{{due.montantDonnee}}fr</span></div>
+</div>
+{{ form_widget(form) }}
+<input
+  type="submit"
+  class="float-right px-4 py-2 bg-gray-500 cursor-pointer rounded-xl"
+  value="payer"
+/>
+{{ form_end(form) }}
+
+<h1 class="my-10 text-5xl text-center text-yellow-900 ">les produit du dette</h1>
+{# TABLE PRODUIT ON  #}
+    <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+        <!-- Table -->
+        <table class="min-w-full text-base text-left whitespace-nowrap">
+
+            <!-- Table head -->
+            <thead class="tracking-wider uppercase border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                <tr>
+                    <th scope="col" class="px-6 py-5">
+                    nbr
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    categorie
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    detail
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    qte
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    total
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table body -->
+                <tbody>
+                    {% for i,item in due.detaillDette %}
+                        <tr class="border-b dark:border-neutral-600">                        
+                            <td class="px-6 py-5">{{i+1}}</td>
+                            <td class="px-6 py-5">{{item.produit.categorie}}</td>
+                            <td class="px-6 py-5">{{item.produit.detail}}</td>
+                            <td class="px-6 py-5">{{item.qteVente}}</td>                            
+                            <td class="px-6 py-5">{{item.prixVente}}</td>  
+                            <td class="px-6 py-5">{{item.prixVente * item.qteVente}}</td>                              
+                        </tr>                
+                    {% endfor %}
+                </tbody>                    
+                <tfoot>
+                    <tr class="border-b dark:border-neutral-600">
+                        <th  class="px-6 py-5 text-2xl">total :</th>
+                        <th colspan="5" class="px-6 py-5 text-2xl"><span class="text-yellow-900 ">{{due.montantTotal}}fr</span></th>
+                    </tr>
+                </tfoot>
+        </table>
+
+    </div>
+{# TABLE PRODUIT OFF  #}
+{% endblock content %}

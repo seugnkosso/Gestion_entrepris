@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block content %}
+{# FORM FILTRE ON #}
+    <div class="w-full p-4 bg-gray-200">
+        <div class="flex items-center w-full gap-3">
+
+            <div class="w-1/3">
+                <input data-path="{{path('app_produit_filtre')}}" placeholder="entrer la categorie ou detail" class="w-full" type="text" value="{{produit??""}}" name="" id="produit">
+            </div>	
+
+                      
+                <div class="w-2/3">
+                    <a href="{{path('app_produit_save')}}" class="float-right p-2 bg-yellow-400 rounded-md">nouveau</a>
+                </div>			
+            
+        </div>
+    </div>
+{# FORM FILTRE OFF #}
+
+{# TABLE ON  #}
+    <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+        <!-- Table -->
+        <table class="min-w-full text-xs text-left whitespace-nowrap">
+
+            <!-- Table head -->
+            <thead class="tracking-wider uppercase border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                <tr>
+                    <th scope="col" class="px-6 py-5">
+                    categorie
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    detail
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    qte
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix Achat
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix Vente fix            
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix Vente min            
+                    </th>
+                    
+                        <th scope="col" class="px-6 py-5">
+                        action
+                        </th>
+
+                    
+                </tr>
+            </thead>
+
+            <!-- Table body -->
+            <tbody>
+                {% for item in pagination %}
+                    <tr class="{{item.qte < 5 ? ' bg-orange-300':''}} {{item.qte == 0 ? ' bg-red-300':''}} border-b dark:border-neutral-600">                        
+                        <td class="px-6 py-5">{{item.categorie}}</td>
+                        <td class="px-6 py-5">{{item.detail}}</td>
+                        <td class="px-6 py-5">{{item.qte}}</td>                            
+                        <td class="px-6 py-5">{{item.prixAchat}}</td>
+                        <td class="px-6 py-5">{{item.prixVenteFix}}</td>
+                        <td class="px-6 py-5">{{item.prixVenteMin}}</td>
+                        
+                            <td class="px-6 py-5">
+                                <a target="_blank" href="{{path('app_produit_save',{id:item.id})}}" class="p-2 bg-yellow-400 rounded">modifier</a>
+                            </td>
+
+                    </tr>                
+                {% endfor %}
+            </tbody>    
+        </table>
+
+    </div>
+{# TABLE OFF  #}
+
+{# KPN PAGINATION ON  #}
+	<div class="py-2 text-center">		
+			{{ knp_pagination_render(pagination) }}		
+	</div>
+{# KPN PAGINATION OFF #}
+
+<div class="">
+    <a class="text-2xl text-red-600" href="{{path('app_produit_all')}}">produits</a>    
+</div>
+{% endblock %}

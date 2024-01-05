@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}detail Facture{% endblock %}
+{% block navebar %}
+    
+{% endblock %}
+{% block content %}
+
+<h1 class="my-10 text-3xl text-center text-yellow-900 ">detail caisse {{date != null ? "du " ~ date }}</h1>
+<section class="w-full text-center">
+    <div class="py-4">
+        <p class="text-3xl">Total Vente : <span class="text-yellow-700 ">{{caisse.totalVente??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">Total commande : <span class="text-yellow-700 ">{{caisse.TotalCommande??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">Total Frais : <span class="text-yellow-700 ">{{caisse.totalFrais??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">Total du payer : <span class="text-yellow-700 ">{{caisse.TotalDusPayer??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">Total dette payer : <span class="text-yellow-700 ">{{caisse.totalDettePayer??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">benefice : <span class="text-yellow-700 ">{{caisse.benefice??0}}fr</span></p>
+    </div>    
+    <div class="py-2">
+        <p class="text-3xl">total caisse : <span class="text-yellow-700 ">{{totalCaisse}}fr</span></p>
+    </div>    
+</section>
+
+<p class="imprimer"></p>
+{% endblock %}

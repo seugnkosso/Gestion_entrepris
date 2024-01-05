@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}facture{% endblock %}
+{% block navebar %}
+    
+{% endblock %}
+{% block content %}
+
+{# HEADER SECTION ON  #}
+    <section class="flex justify-between">
+        <div class="w-1/3 ">
+            <p>entreprise : <span class="text-yellow-900 ">SOS-INFORMATIQUE</span></p>
+            <p>vendeur : <span class="text-yellow-900 ">{{pagination.user.nomComplet}}</span></p>
+            <p>tel : <span class="text-yellow-900 ">{{pagination.user.telephone}}</span></p>
+        </div>
+        <div class="w-1/3 ">
+            <p class="">client : <span class="text-yellow-900 ">{{pagination.client}}</span></p>
+            <p class="">numero : <span class="text-yellow-900 ">{{pagination.numero}}</span></p>
+        </div>
+    </section>
+{# HEADER SECTION OFF  #}
+
+<h1 class="my-10 text-5xl text-center text-yellow-900 ">FACTURE</h1>
+{# TABLE PRODUIT ON  #}
+    <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+        <!-- Table -->
+        <table class="min-w-full text-base text-left whitespace-nowrap">
+
+            <!-- Table head -->
+            <thead class="tracking-wider uppercase border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                <tr>
+                    <th scope="col" class="px-6 py-5">
+                    nbr
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    categorie
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    detail
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    qte
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    total
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table body -->
+                <tbody>
+                    {% for i,item in pagination.detailVc %}
+                        <tr class="border-b dark:border-neutral-600">                        
+                            <td class="px-6 py-5">{{i+1}}</td>
+                            <td class="px-6 py-5">{{item.produit.categorie}}</td>
+                            <td class="px-6 py-5">{{item.produit.detail}}</td>
+                            <td class="px-6 py-5">{{item.qteVente}}</td>                            
+                            <td class="px-6 py-5">{{item.prixVente}}</td>  
+                            <td class="px-6 py-5">{{item.prixVente * item.qteVente}}</td>                              
+                        </tr>                
+                    {% endfor %}
+                </tbody>                    
+                <tfoot>
+                    <tr class="border-b dark:border-neutral-600">
+                        <th  class="px-6 py-5 text-2xl">total :</th>
+                        <th colspan="5" class="px-6 py-5 text-2xl"><span class="text-yellow-900 ">{{pagination.total}}fr</span></th>
+                    </tr>
+                </tfoot>
+        </table>
+
+    </div>
+{# TABLE PRODUIT OFF  #}
+<p class="imprimer"></p>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}Log in!{% endblock %}
+
+{% block navebar %}{% endblock %}
+{% block content %}
+	<div class="w-1/2 py-40 m-auto">
+		<div class="">
+			<form method="post">
+				{% if error %}
+					<div class="text-red-700 ">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+				{% endif %}
+				<h1 class="text-3xl text-black ">connexion</h1>
+				
+				<div class="w-full my-3 ">
+					<label for="inputEmail">Email</label>				
+					<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="w-full form-control" autocomplete="email" required autofocus>
+				</div>
+				
+				<div class="w-full">
+					<label for="inputPassword">Password</label>
+					<input type="password" name="password" id="inputPassword" class="w-full form-control" autocomplete="current-password" required>
+				</div>
+				
+				<div class="w-full">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+				</div>
+
+				<button class="float-right px-4 py-2 mt-2 rounded hover:text-white bg-slate-700" type="submit">
+					connecter
+				</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}

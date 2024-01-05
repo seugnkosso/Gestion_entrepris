@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %} {% block title %}dus{% endblock %} {% block
+content %}
+<div class="mb-3 text-2xl">ajout de dus</div>
+
+<p class="text-base text-red-500">{{succes['addSucces']??""}}</p>
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+<input
+  type="submit"
+  class="float-right px-4 py-2 bg-gray-500 cursor-pointer rounded-xl"
+  value="ajouter"
+/>
+{{ form_end(form) }}
+{% endblock content %}

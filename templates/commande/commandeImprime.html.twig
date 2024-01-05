@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All Commande{% endblock %}
+{% block navebar %}
+    
+{% endblock %}
+{% block content %}
+
+<h1 class="text-center text-5xl my-10 text-yellow-900 ">les commandes du {{date}}</h1>
+{# TABLE PRODUIT ON  #}
+    <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+        <!-- Table -->
+        <table class="min-w-full text-base text-left whitespace-nowrap">
+
+            <!-- Table head -->
+            <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                <tr>
+                    <th scope="col" class="px-6 py-5">
+                    nbr
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    categorie
+                    </th>            
+                    <th scope="col" class="px-6 py-5">
+                    detail
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    qte
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    prix vente
+                    </th>
+                    <th scope="col" class="px-6 py-5">
+                    total
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table body -->
+                <tbody>
+                    {% set i = -1 %}
+                    {% for p in pagination %}
+                        {% for item in p.detailVc %}
+                            {% set i = i + 1%}
+                            <tr class=" border-b dark:border-neutral-600">                        
+                                <td class="px-6 py-5">{{i+1}}</td>
+                                <td class="px-6 py-5">{{item.produit.categorie}}</td>
+                                <td class="px-6 py-5">{{item.produit.detail}}</td>
+                                <td class="px-6 py-5">{{item.qteVente}}</td>                            
+                                <td class="px-6 py-5">{{item.prixVente}}fr</td>  
+                                <td class="px-6 py-5">{{item.prixVente * item.qteVente}}fr</td>                              
+                            </tr>                
+                        {% endfor %}                        
+                    {% endfor %}
+                </tbody>                    
+                <tfoot>
+                    <tr class="border-b dark:border-neutral-600">
+                        <td  class="text-2xl px-6 py-5">total :</td>
+                        <td colspan="5" class="text-2xl px-6 py-5"><span class="text-yellow-900 ">{{total}}fr</span></td>
+                    </tr>
+                </tfoot>
+        </table>
+    </div>
+{# TABLE PRODUIT OFF  #}
+<p class="imprimer"></p>
+{% endblock %}

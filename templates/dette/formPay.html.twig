@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %} {% block title %}dus Pay{% endblock %} {% block
+content %}
+<div class="mb-3 text-2xl">payement de dus</div>
+{# SECTION PANIER ET RECHERCHE ON #}
+    <section class="">
+        {# FORM FILTRE ON #}
+            <div class="w-full p-4 bg-gray-200">
+                <div class="flex items-center w-full gap-3">
+                    <div class="w-1/3 m-auto">
+                        <input data-path="{{path('app_dette_filtreProduit')}}" placeholder="categorie ou detail" class="w-full text-center" type="text" value="{{date??""}}" name="" id="produit_Dette">
+                    </div>			
+                </div>
+            </div>
+        {# FORM FILTRE OFF #}
+
+        {# TABLE ON  #}
+            <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+                <!-- Table -->
+                <table class="min-w-full text-xs text-left whitespace-nowrap">
+                    <!-- Table body -->
+                    <tbody>
+                        {% for item in pagination %}
+                        <form action="/due/panier" method="post">
+                            <tr class="text-base text-black border-b - dark:border-neutral-600">                        
+                                <td class="px-6 py-5">categorie : {{item.categorie}}</td>
+                                <td class="px-6 py-5">detail : {{item.detail}}</td>
+                                <td class="px-6 py-5">
+                                    prix vente :
+                                    <input type="number" name="prixVente" min="{{item.prixVenteMin}}" max="{{item.prixVenteFix}}" value="{{item.prixVenteFix}}"> 
+                                </td>                                
+                                <td class="px-6 py-5">
+                                    qte : 
+                                    <input type="number" max="{{item.qte}}" min="1" value="1" name="qteDonner" id="">
+                                    <input type="hidden" name="idProduit" value="{{item.id}}">
+                                </td>
+                                <td class="px-6 py-5">
+                                    <input type="submit" class="p-2 bg-yellow-400 rounded cursor-pointer" value="ajouter au panier">                                  
+                                </td>
+                            </tr>                                            
+                        </form>
+                        {% endfor %}
+                    </tbody>    
+                </table>
+
+            </div>
+        {# TABLE OFF  #}
+        {# KPN PAGINATION ON  #}
+            <div class="py-2 text-center">		
+                    {{ knp_pagination_render(pagination) }}		
+            </div>
+        {# KPN PAGINATION OFF #} 
+    </section>
+{# SECTION PANIER ET RECHERCHE OFF #}
+
+{# SECTION AFFICHE PANIER ET VALIDE ON #}
+    <p class="text-base text-red-600">{{errors["qteExcés"]??""}}</p>
+    <p class="text-base text-red-600">{{errors["panierVide"]??""}}</p>
+    <p class="text-base text-red-600">{{succes["venteSucces"]??""}}</p>
+    <section class="">
+        {# TABLE ON  #}
+            <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+            <!-- Table -->
+                <table class="min-w-full text-xs text-left whitespace-nowrap">
+
+                    <!-- Table body -->
+                    {% if produitpaniers != null %}
+                            <!-- Table head -->
+                        <thead class="tracking-wider uppercase border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                            <tr>
+                                <th scope="col" class="px-6 py-5">
+                                categorie
+                                </th>            
+                                <th scope="col" class="px-6 py-5">
+                                detail
+                                </th>
+                                <th scope="col" class="px-6 py-5">
+                                qte
+                                </th>
+                                <th scope="col" class="px-6 py-5">
+                                prix
+                                </th>
+                                <th scope="col" class="px-6 py-5">
+                                total
+                                </th>
+                                <th scope="col" class="px-6 py-5">
+                                action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set total = 0 %}
+                            {% for item in produitpaniers %}
+                                {% set total = total + (item.qte * item.prixVenteFix) %}
+                                <tr class="border-b dark:border-neutral-600">                        
+                                    <td class="px-6 py-5">{{item.categorie}}</td>
+                                    <td class="px-6 py-5">{{item.detail}}</td>
+                                    <td class="px-6 py-5">{{item.qte}}</td>                            
+                                    <td class="px-6 py-5">{{item.prixVenteFix}}</td>  
+                                    <td class="px-6 py-5 text-base">{{item.prixVenteFix * item.qte}}</td>
+                                    <td class="px-6 py-5">
+                                        <a href="{{path('app_session_delete_session',{id:item.id})}}" class="p-2 bg-yellow-400 rounded">supprimer</a>
+                                    </td>
+                                </tr>                
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                                <tr>
+                                    <th  class="px-6 py-3 text-2xl">Total  : </span></th>
+                                    <th class="px-6 py-3 text-2xl"><span class="text-yellow-900 ">{{total}}fr</th>
+                                </tr>
+                                {# <tr>
+                                    <th  class="px-6 py-3 text-2xl">TVA 18% : </span></th>
+                                    <th class="px-6 py-3 text-2xl"><span class="text-yellow-900 ">{{(total * 18)/100}}fr</th>
+                                </tr>
+                                <tr>
+                                    <th  class="px-6 py-3 text-2xl">Total TTC: </span></th>
+                                    <th class="px-6 py-3 text-2xl"><span class="text-yellow-900 ">{{((total * 18)/100) + total}}fr</th>
+                                </tr>                         #}
+                        </tfoot>                     
+                    {% endif %}
+                    
+                </table>
+            </div>
+        {# TABLE OFF  #}
+    </section>
+{# SECTION AFFICHE PANIER ET VALIDE OFF #}
+
+<p class="text-base text-red-500">{{succesPay??""}}</p>
+
+{# SECTION DETTE INFO ON  #}
+  <div class="mb-3 text-2xl text-red-600">{{errors['erreurMontant']??""}}</div>
+
+  {{ form_start(form) }}
+  <div class="">
+    <div class="p-2 text-2xl ">client : <span class="text-yellow-600 text-bold">{{due.client}}</span></div>
+    <div class="p-2 text-2xl ">libelle : <span class="text-yellow-600 text-bold">{{due.libelle}}</span></div>
+    <div class="p-2 text-2xl ">date : <span class="text-yellow-600 text-bold">{{due.creatAt.format("Y-m-d")}}</span></div>
+    <div class="p-2 text-2xl ">montant total : <span class="text-yellow-600 text-bold">{{due.montantTotal}}fr</span></div>
+    <div class="p-2 text-2xl ">montant restant : <span class="text-yellow-600 text-bold">{{due.montantRestant}}fr</span></div>
+    <div class="p-2 text-2xl ">montant donnee : <span class="text-yellow-600 text-bold">{{due.montantDonnee}}fr</span></div>
+  </div>
+  {{ form_widget(form) }}
+  <input
+    type="submit"
+    class="float-right px-4 py-2 bg-gray-500 cursor-pointer rounded-xl"
+    value="payer"
+  />
+  {{ form_end(form) }}
+{# SECTION DETTE INFO OFF  #}
+
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %} {% block title %}Dette Pay{% endblock %} {% block
+content %}
+<div class="mb-3 text-2xl">payement de Dette</div>
+<div class="mb-3 text-2xl text-red-600">{{error['erreurMontant']??""}}</div>
+
+<p class="text-base text-red-500">{{succes['paySucces']??""}}</p>
+
+{{ form_start(form) }}
+<div class="">
+  <div class="p-2 text-2xl ">client : <span class="text-yellow-600 text-bold">{{due.client}}</span></div>
+  <div class="p-2 text-2xl ">libelle : <span class="text-yellow-600 text-bold">{{due.libelle}}</span></div>
+  <div class="p-2 text-2xl ">date : <span class="text-yellow-600 text-bold">{{due.creatAt.format("Y-m-d")}}</span></div>
+  <div class="p-2 text-2xl ">montant total : <span class="text-yellow-600 text-bold">{{due.montantTotal}}fr</span></div>
+  <div class="p-2 text-2xl ">montant restant : <span class="text-yellow-600 text-bold">{{due.montantRestant}}fr</span></div>
+</div>
+{{ form_widget(form) }}
+<input
+  type="submit"
+  class="float-right px-4 py-2 bg-gray-500 cursor-pointer rounded-xl"
+  value="payer"
+/>
+{{ form_end(form) }}
+{% endblock content %}
