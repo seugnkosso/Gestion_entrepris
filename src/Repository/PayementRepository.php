@@ -127,9 +127,11 @@ class PayementRepository extends ServiceEntityRepository
             ->join("p.DD","d")
             ->select("SUM(p.montantVerser)")
             ->where('d.typeDD = :dus')
-            ->setParameter("dus",'dus')
-            ->andwhere("p.creatAt like :date")
-            ->setParameter("date",'%'.$date.'%');
+            ->setParameter("dus",'dus');
+            if(!empty($data)){
+                $query = $query->andwhere("p.creatAt like :date")
+                        ->setParameter("date",'%'.$date.'%');
+            }
             return $query->getQuery()
                         ->getSingleScalarResult();
 

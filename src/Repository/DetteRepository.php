@@ -72,7 +72,7 @@ class DetteRepository extends ServiceEntityRepository
     public function findTotalDate($filtre)
     {
         $query = $this ->createQueryBuilder("d")
-                ->select('SUM(d.montantTotal - d.montantDonnee)');                       
+                ->select('SUM(d.montantTotal)');                       
         if(!empty($filtre['inputFiltredateVente'])){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['inputFiltredateVente'].'%');
