@@ -22,6 +22,7 @@ class AdminController extends AbstractController
     {
         $this->hasher = $hasher;
     }
+    
     #[Route('/admin', name: 'app_admin')]
     public function index(AdminRepository $adminRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {

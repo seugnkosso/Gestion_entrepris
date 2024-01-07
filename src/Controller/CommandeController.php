@@ -106,6 +106,7 @@ class CommandeController extends AbstractController
                 $detailVc->setPrixVente($pn->getPrixVenteFix());
                 $detailVc->setProduit($prod);
                 $detailVc->setVC($commande);
+                $detailVc->setPrixAchat($prod->getPrixAchat());
                 $manager->persist($detailVc);
             }     
             $commande->setClient($session->get("client"));
@@ -159,6 +160,7 @@ class CommandeController extends AbstractController
                 $detailVc->setPrixVente($pn->getPrixVente());
                 $detailVc->setProduit($pn->getProduit());
                 $detailVc->setVC($vente);
+                $detailVc->setPrixAchat($pn->getPrixAchat());
                 $manager->persist($detailVc);
                 $manager->remove($pn);
             }     

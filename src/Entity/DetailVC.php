@@ -30,6 +30,9 @@ class DetailVC
     #[ORM\ManyToOne(inversedBy: 'detaillDette')]
     private ?DetteParVente $detteParVente = null;
 
+    #[ORM\Column]
+    private ?float $prixAchat = null;
+
 
     public function getId(): ?int
     {
@@ -92,6 +95,18 @@ class DetailVC
     public function setDetteParVente(?DetteParVente $detteParVente): static
     {
         $this->detteParVente = $detteParVente;
+
+        return $this;
+    }
+
+    public function getPrixAchat(): ?float
+    {
+        return $this->prixAchat;
+    }
+
+    public function setPrixAchat(float $prixAchat): static
+    {
+        $this->prixAchat = $prixAchat;
 
         return $this;
     }

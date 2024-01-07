@@ -100,6 +100,7 @@ class DetteParVenteController extends AbstractController
                     $detailVc->setProduit($prod);
                     $detailVc->setVC($vente);
                     $detailVc->setDetteParVente($detteParVente);
+                    $detailVc->setPrixAchat($prod->getPrixAchat());
                     $manager->persist($detailVc);
                 }     
                 $user = $userRepository->findOneBy(["email"=>$this->getUser()->getUserIdentifier()]);

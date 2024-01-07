@@ -81,10 +81,10 @@ class CaisseController extends AbstractController
             $caisse->setTotalCommande($totalCommande??0);
 
             $venteBenefice = $venteRepository->findTotalDate($date->format('Y-m-d'));
-            $TotalDusNonPayer = $detteRepository->findTotalDate($date->format('Y-m-d'));
+            // $TotalDusNonPayer = $detteRepository->findTotalDate($date->format('Y-m-d'));
             
             $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($date->format('Y-m-d'));
-            $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais + $TotalDusNonPayer);
+            $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais);
             // dd($detteBeneficeDay);
             $caisse->setBenefice($benefice);
 

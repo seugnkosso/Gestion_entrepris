@@ -202,6 +202,7 @@ class VenteController extends AbstractController
                 $detailVc->setPrixVente($pn->getPrixVenteFix());
                 $detailVc->setProduit($prod);
                 $detailVc->setVC($vente);
+                $detailVc->setPrixAchat($prod->getPrixAchat());
                 $manager->persist($detailVc);
             }
             $user = $userRepository->findOneBy(["email"=>$this->getUser()->getUserIdentifier()]);

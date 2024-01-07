@@ -38,6 +38,7 @@ class ProduitController extends AbstractController
             "produit" => $prod??""
         ]);
     }
+    
     #[Route('/produit/all', name: 'app_produit_all')]
     public function AllProduit(ProduitRepository $produitRepository,Request $request,Session $session): Response
     {
