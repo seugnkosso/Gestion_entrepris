@@ -61,9 +61,10 @@ class VenteController extends AbstractController
         // BENEFICE VENTE ON                         
             $totalFrais = $fraisRepository->findAllDay($filtre['inputFiltredateVente']);                                        
             $venteBenefice = $venteRepository->findTotalDate($filtre);
-            $TotalDusNonPayer = $detteRepository->findTotalDate($filtre);            
+            // dd($venteBenefice);
+            // $TotalDusNonPayer = $detteRepository->findTotalDate($filtre);            
             $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($filtre['inputFiltredateVente']);
-            $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais + $TotalDusNonPayer);
+            $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais);
         // BENEFICE VENTE OFF 
         return $this->render('vente/index.html.twig', [
             "pagination" => $pagination,

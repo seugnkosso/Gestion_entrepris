@@ -100,7 +100,8 @@ class VenteRepository extends ServiceEntityRepository
         {
             $query = $this ->createQueryBuilder("v")
                     ->join("v.detailVc", "d")                    
-                    ->select('SUM(v.total) - SUM(d.prixVente * d.qteVente)')
+                    ->join("d.produit", "p")                    
+                    ->select('SUM(v.total) - SUM(p.prixAchat * d.qteVente)')
                     ->where("v.total > 0");                   
             if(!empty($filtre['inputFiltredateVente'])){
                 $query->andWhere('v.creatAt like :date')

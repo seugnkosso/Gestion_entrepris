@@ -143,11 +143,11 @@ class DetteController extends AbstractController
                 $errors['erreurMontant'] = "le montant donner est supperieur au reste a payer";
             }else{
                 $payement = new Payement();
-                $payement->setMontantVerser($dette->getMontantDonnee());
+                $payement->setMontantVerser($dette->getMontantDonnee() + $prixTotal);
                 $dette->setMontantRestant($dette->getMontantRestant()-($dette->getMontantDonnee()+$prixTotal));  
 
                 if($session->has("montantDonnee")){
-                    $dette->setMontantDonnee($dette->getMontantDonnee() + $session->get("montantDonnee"));                   
+                    $dette->setMontantDonnee($dette->getMontantDonnee() + $session->get("montantDonnee") + $prixTotal);                   
                     $session->remove("montantDonnee");
                 }
 
