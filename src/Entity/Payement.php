@@ -28,6 +28,9 @@ class Payement
     #[ORM\ManyToOne(inversedBy: 'payements')]
     private ?DetteParVente $detteParVente = null;
 
+    #[ORM\Column]
+    private ?float $prixTotalVente = 0;
+
     public function __construct(){
         $date = new \DateTimeImmutable();
         $this->creatAt = new \DateTimeImmutable($date->format('Y-m-d H:i'));
@@ -94,6 +97,18 @@ class Payement
     public function setDetteParVente(?DetteParVente $detteParVente): static
     {
         $this->detteParVente = $detteParVente;
+
+        return $this;
+    }
+
+    public function getPrixTotalVente(): ?float
+    {
+        return $this->prixTotalVente;
+    }
+
+    public function setPrixTotalVente(float $prixTotalVente): static
+    {
+        $this->prixTotalVente = $prixTotalVente;
 
         return $this;
     }

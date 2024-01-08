@@ -74,7 +74,8 @@ class CaisseController extends AbstractController
             $totalDettePayer = $payementRepository->findAllDayDette($date->format('Y-m-d'));        
             $caisse->setTotalDettePayer($totalDettePayer??0);
             
-            $totalDusPayer = $payementRepository->findAllDayDus($date->format('Y-m-d'));        
+            $totalDusPayer = $payementRepository->findAllDayDus($date->format('Y-m-d')); 
+            // dd($totalDusPayer);
             $caisse->setTotalDusPayer($totalDusPayer??0);
             
             $totalCommande = $commandeRepository->findAllDay($date->format('Y-m-d'));        

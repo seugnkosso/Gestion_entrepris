@@ -144,6 +144,7 @@ class DetteController extends AbstractController
             }else{
                 $payement = new Payement();
                 $payement->setMontantVerser($dette->getMontantDonnee() + $prixTotal);
+                $payement->setPrixTotalVente($prixTotal);
                 $dette->setMontantRestant($dette->getMontantRestant()-($dette->getMontantDonnee()+$prixTotal));  
 
                 if($session->has("montantDonnee")){

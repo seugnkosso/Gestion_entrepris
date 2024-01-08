@@ -125,10 +125,10 @@ class PayementRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('p')
             ->join("p.DD","d")
-            ->select("SUM(p.montantVerser)")
+            ->select("SUM(p.montantVerser) - SUM(p.prixTotalVente)")
             ->where('d.typeDD = :dus')
             ->setParameter("dus",'dus');
-            if(!empty($data)){
+            if(!empty($date)){
                 $query = $query->andwhere("p.creatAt like :date")
                         ->setParameter("date",'%'.$date.'%');
             }
