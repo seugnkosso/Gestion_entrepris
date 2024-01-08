@@ -45,7 +45,7 @@
                     </tr>                
                 {% endfor %}
                 <tr class="text-base border-b dark:border-neutral-600">                        
-                        <td class="px-6 py-5">toute la caisse {{ date != null ? "du " ~ date : ""}}</td>                                                
+                        <td class="px-6 py-5">depuis {{ date != null ? " " ~ date : "le premier jour"}}</td>                                                
                         <td class="px-6 py-5 text-right">
                             <a target="_blank" href="{{path('app_caisse_detail_date',{date:date})}}" class="p-2 bg-yellow-400 rounded ">details</a>                            
                         </td>
