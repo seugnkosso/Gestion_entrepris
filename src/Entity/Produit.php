@@ -17,7 +17,6 @@ class Produit
     private ?int $id = null;
 
     #[ORM\Column(length: 255,unique: true)]
-    #[Assert\Unique]
     private ?string $detail = null;
 
     #[ORM\Column]
