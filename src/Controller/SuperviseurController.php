@@ -6,6 +6,7 @@ use App\Entity\Superviseur;
 use App\Form\SuperviseurFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SuperviseurRepository;
+use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,7 @@ class SuperviseurController extends AbstractController
     }
 
     #[Route('/superviseur/save/{id?}', name: 'app_superviseur_save')]
-    public function save($id,SuperviseurRepository $superviseurRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,UserRepository $userRepository,SuperviseurRepository $superviseurRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $superviseur = new Superviseur();
@@ -78,6 +79,8 @@ class SuperviseurController extends AbstractController
                 $superviseur, 
                 $superviseur->getPassword()
             ));
+            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
+            $superviseur->setEntreprise($user->getEntreprise());
             $manager->persist($superviseur);
             $manager->flush();
             $succes["addSucces"] = "superviseur ajouter avec succes";

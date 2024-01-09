@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Vendeur;
 use App\Form\VendeurFormType;
+use App\Repository\UserRepository;
 use App\Repository\VendeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -46,7 +47,7 @@ class VendeurController extends AbstractController
     }
 
     #[Route('/vendeur/save/{id?}', name: 'app_vendeur_save')]
-    public function save($id,VendeurRepository $vendeurRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,UserRepository $userRepository,VendeurRepository $vendeurRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $vendeur = new Vendeur();
@@ -62,6 +63,8 @@ class VendeurController extends AbstractController
                 $vendeur, 
                 $vendeur->getPassword()
             ));
+            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
+            $vendeur->setEntreprise($user->getEntreprise());
             $manager->persist($vendeur);
             $manager->flush();
             $succes["addSucces"] = "vendeur ajouter avec succes";

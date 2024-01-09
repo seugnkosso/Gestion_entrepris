@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Dette::class)]
     private Collection $dettes;
 
+    #[ORM\Column(length: 255)]
+    private ?string $entreprise = null;
+
     public function __construct()
     {
         $this->VC = new ArrayCollection();
@@ -250,6 +253,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $dette->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEntreprise(): ?string
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(string $entreprise): static
+    {
+        $this->entreprise = $entreprise;
 
         return $this;
     }

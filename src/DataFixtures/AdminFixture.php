@@ -29,6 +29,7 @@ class AdminFixture extends Fixture
             $user->setIsArchived(false);
             $password = $this->hasher->hashPassword($user, 'lionkonkionjunior1');
             $user->setPassword($password);
+            $user->setEntreprise("me");
             $manager->persist($user);
             $this->addReference("user".$i,$user);
         }        

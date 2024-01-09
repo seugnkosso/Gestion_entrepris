@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Admin;
 use App\Form\AdminFormType;
 use App\Repository\AdminRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +47,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/admin/save/{id?}', name: 'app_admin_save')]
-    public function save($id,AdminRepository $adminRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,UserRepository $userRepository,AdminRepository $adminRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $admin = new Admin();
@@ -60,7 +61,9 @@ class AdminController extends AbstractController
             $admin->setPassword($this->hasher->hashPassword(
                 $admin, 
                 $admin->getPassword()
-            ));         
+            )); 
+            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
+            $admin->setEntreprise($user->getEntreprise());
             $manager->persist($admin);
             $manager->flush();
             $succes["addSucces"] = "admin ajouter avec succes";
