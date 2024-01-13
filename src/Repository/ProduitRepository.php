@@ -38,7 +38,7 @@ class ProduitRepository extends ServiceEntityRepository
     public function findByFiltre($filtre): array
     {
         $query = $this->createQueryBuilder('p')           
-            ->orderBy('p.qte', 'ASC');
+            ->orderBy('p.qte', 'DESC');
             
         if(!empty($filtre['qteFiltreManque'])){
             $query->andWhere('p.qte < :qteFiltreManque')
@@ -60,7 +60,7 @@ class ProduitRepository extends ServiceEntityRepository
     public function findByFiltreVente($filtre): array
     {
         $query = $this->createQueryBuilder('p')           
-            ->orderBy('p.qte', 'ASC')
+            ->orderBy('p.qte', 'DESC')
             ->where("p.qte > 0");
             
         if(!empty($filtre['qteFiltreManque'])){

@@ -39,14 +39,11 @@ class ProduitController extends AbstractController
             "produit" => $prod??""
         ]);
     }
-    
+
     #[Route('/produit/all', name: 'app_produit_all')]
     public function AllProduit(ProduitRepository $produitRepository,Request $request,Session $session): Response
     {
 
-        
-
-                
         $filtre = [];
         
         if($session->has("qteFiltreExiste")){
@@ -81,6 +78,38 @@ class ProduitController extends AbstractController
         ]);
     }
 
+    #[Route('/produit/saveExcel', name: 'app_produit_save_excel')]
+    public function saveExcel(ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
+    {
+
+        $excel = new SimpleExcel('CSV');
+        $excel->parser->loadFile('C:/xampp/htdocs/gestion_stock/stock/All produit.csv');
+
+        // récupération de tous les produit du excel         
+        $AllProduits = $excel->parser->getAllRow();
+
+        foreach ($AllProduits as $key => $value) {
+            $prod = explode(";",$value);
+            if($prod[0] !== "id"){
+                $produit = $produitRepository->find($prod[0]);
+                if($produit == null){
+                    $produit = new Produit();
+                }
+                $produit->setDetail($prod[1]);
+                $produit->setQte($prod[2]);
+                $produit->setPrixAchat($prod[3]);
+                $produit->setPrixVenteFix($prod[4]);
+                $produit->setPrixventeMin($prod[5]);
+                $produit->setCategorie($prod[6]);
+                // dd($produit);
+                $manager->persist($produit);            
+            }        
+        }                
+        // dd("ok");
+        $manager->flush();
+        // $succes["addSucces"] = "produit ajouter avec succes";
+        return $this->redirectToRoute("app_produit");
+    }
     #[Route('/produit/save/{id?}', name: 'app_produit_save')]
     public function save($id,ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
     {

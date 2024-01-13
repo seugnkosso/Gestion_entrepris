@@ -21,7 +21,8 @@
 {# FORM FILTRE OFF #}
 
 <div class="">
-    <a class="text-2xl text-red-600" href="{{path('app_produit_all')}}">produits</a>    
+    <a class="text-2xl text-red-600" href="{{path('app_produit_all')}}">produits</a> 
+    <a onClick="return confirm('Attention : risque de réinitialisation')" class="float-right text-2xl text-red-600"  href="{{path('app_produit_save_excel')}}"> ajout par excel</a>
 </div>
 
 {# TABLE ON  #}
