@@ -20,6 +20,13 @@
     
 {# FORM FILTRE OFF #}
 
+{% if imprimer == null %}  
+<div class="">
+    <a href="{{path('app_produit_all',{imprimer:"yes"})}}"><input type="submit" value="">enregistrer</a>
+    <a class="text-red-600 " href="{{path('app_produit')}}"><input type="submit" value="">retour</a>
+</div>
+{% endif %}
+
 {# TABLE ON  #}
     <div class="m-4 bg-white dark:bg-neutral-700">
 
@@ -71,13 +78,6 @@
 
     </div>
 {# TABLE OFF  #}
-
-{% if imprimer == null %}  
-<div class="">
-    <a target="_blank" href="{{path('app_produit_all',{imprimer:"yes"})}}"><input type="submit" value="">imprimer</a>
-    <a class="text-red-600 " href="{{path('app_produit')}}"><input type="submit" value="">retour</a>
-</div>
-{% endif %}
 
 {% if imprimer != null %}  
 <p class="imprimer"></p>

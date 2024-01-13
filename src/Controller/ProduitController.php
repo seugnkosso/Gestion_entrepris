@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Produit;
+use SimpleExcel\SimpleExcel;
 use App\Form\ProduitFormType;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +43,10 @@ class ProduitController extends AbstractController
     #[Route('/produit/all', name: 'app_produit_all')]
     public function AllProduit(ProduitRepository $produitRepository,Request $request,Session $session): Response
     {
+
+        
+
+                
         $filtre = [];
         
         if($session->has("qteFiltreExiste")){
@@ -49,11 +54,25 @@ class ProduitController extends AbstractController
         }   
         if($session->has("qteFiltreManque")){
             $filtre['qteFiltreManque'] = $qteFiltreManque =  $session->get("qteFiltreManque");            
-        }
-        if($request->query->get("imprimer")){
-            $imprimer = $request->query->get("imprimer");
+            // dd($qteFiltreManque);
         }
         $produit = $produitRepository->findByFiltre($filtre);
+        if($request->query->get("imprimer")){
+            $excel = new SimpleExcel('csv');
+
+            $excel->writer->addRow(array('id', 'detail', 'qte', 'prix_achat', 'prix_vente_fix', 'prix_vente_min', 'categorie')); // insert more record
+            foreach ($produit as $key => $value) {            
+                $excel->writer->addRow(array($value->getId(), $value->getDetail(), $value->getQte(), $value->getPrixAchat(), $value->getPrixVenteFix(), $value->getPrixventeMin(), $value->getCategorie())); // insert more record
+            }
+            if($session->has("qteFiltreExiste")){
+                $name = "produit reel";
+            }else if($session->has("qteFiltreManque")){                
+                $name = "produit manquant";
+            }else{
+                $name = "All produit";
+            }
+            $excel->writer->saveFile($name);
+        }
         return $this->render('produit/AllProduit.html.twig', [
             "pagination" => $produit,
             "qteFiltreExiste" => $qteFiltreExiste??"",
