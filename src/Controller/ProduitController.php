@@ -83,7 +83,7 @@ class ProduitController extends AbstractController
     {
 
         $excel = new SimpleExcel('CSV');
-        $excel->parser->loadFile('C:/xampp/htdocs/gestion_stock/stock/All produit.csv');
+        $excel->parser->loadFile('C:/xampp/htdocs/gestion_entrepris/stock/All produit.csv');
 
         // récupération de tous les produit du excel         
         $AllProduits = $excel->parser->getAllRow();
