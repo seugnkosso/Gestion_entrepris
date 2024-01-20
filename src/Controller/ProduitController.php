@@ -34,9 +34,14 @@ class ProduitController extends AbstractController
             10 /*limit per page*/
         );
         
+        if($session->has("update")){
+            $succes = $session->get("update");
+            $session->remove("update");
+        }  
         return $this->render('produit/index.html.twig', [
             "pagination" => $pagination,
-            "produit" => $prod??""
+            "produit" => $prod??"",
+            "succes" => $succes??null
         ]);
     }
 
@@ -82,32 +87,36 @@ class ProduitController extends AbstractController
     public function saveExcel(ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
     {
 
-        $excel = new SimpleExcel('CSV');
-        $excel->parser->loadFile('C:/xampp/htdocs/Gestion_entrepris/stock/All produit.csv');
-
-        // récupération de tous les produit du excel         
-        $AllProduits = $excel->parser->getAllRow();
-
-        foreach ($AllProduits as $key => $value) {
-            $prod = explode(";",$value);
-            if($prod[0] !== "id"){
-                $produit = $produitRepository->find($prod[0]);
-                if($produit == null){
-                    $produit = new Produit();
-                }
-                $produit->setDetail($prod[1]);
-                $produit->setQte($prod[2]);
-                $produit->setPrixAchat($prod[3]);
-                $produit->setPrixVenteFix($prod[4]);
-                $produit->setPrixventeMin($prod[5]);
-                $produit->setCategorie($prod[6]);
-                // dd($produit);
-                $manager->persist($produit);            
-            }        
-        }                
-        // dd("ok");
-        $manager->flush();
-        // $succes["addSucces"] = "produit ajouter avec succes";
+        try {            
+            $excel = new SimpleExcel('CSV');
+            $excel->parser->loadFile('C:/xampp/htdocs/Gestion_entrepris/stock/All produit.csv');
+    
+            // récupération de tous les produit du excel         
+            $AllProduits = $excel->parser->getAllRow();
+    
+            foreach ($AllProduits as $key => $value) {
+                $prod = explode(";",$value);
+                if($prod[0] !== "id"){
+                    $produit = $produitRepository->find($prod[0]);
+                    if($produit == null){
+                        $produit = new Produit();
+                    }
+                    $produit->setDetail($prod[1]);
+                    $produit->setQte($prod[2]);
+                    $produit->setPrixAchat($prod[3]);
+                    $produit->setPrixVenteFix($prod[4]);
+                    $produit->setPrixventeMin($prod[5]);
+                    $produit->setCategorie($prod[6]);
+                    // dd($produit);
+                    $manager->persist($produit);            
+                }        
+            }                            
+            $manager->flush();
+            $succes = "produits mis a jour";
+        } catch (\Throwable $th) {
+            $succes = "un probleme est survenu lors de la mis a jour";
+        }
+        $session->set("update",$succes);
         return $this->redirectToRoute("app_produit");
     }
     #[Route('/produit/save/{id?}', name: 'app_produit_save')]
