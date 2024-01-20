@@ -1,0 +1,26 @@
+scoop powershell:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+
+symfony cli :
+scoop install symfony-cli
+
+7zip :
+scoop install 7zip
+
+déploiement : 
+git clone https://github.com/seugnKosso/Gestion_entrepris.git
+composer install 
+php bin/console doctrine:migrations:migrate
+set APP_ENV=prod
+php bin/console cache:clear --env=prod --no-debug
+php bin/console assets:install
+
+mise a jour :
+git pull
+git fetch 
+composer install 
+php bin/console doctrine:migrations:migrate
+php bin/console cache:clear --env=prod --no-debug
+php bin/console assets:install
+
