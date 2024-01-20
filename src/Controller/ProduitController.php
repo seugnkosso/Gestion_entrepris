@@ -112,7 +112,7 @@ class ProduitController extends AbstractController
                 }        
             }                            
             $manager->flush();
-            $succes = "produits mis a jour";
+            $succes = "stock mis a jour";
         } catch (\Throwable $th) {
             $succes = "un probleme est survenu lors de la mis a jour";
         }
