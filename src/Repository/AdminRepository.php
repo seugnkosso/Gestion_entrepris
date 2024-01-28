@@ -37,7 +37,10 @@ class AdminRepository extends ServiceEntityRepository
 //    }
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('a');            
+        $query = $this->createQueryBuilder('a')
+                ->join('a.points','p')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
 
         if(!empty($filtre['inputUserFiltre'])){
             $query->andWhere('a.nomComplet like :user or a.telephone like :user')

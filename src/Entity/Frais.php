@@ -22,6 +22,10 @@ class Frais
     #[ORM\Column]
     private ?\DateTimeImmutable $creatAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'frais')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Point $point = null;
+
     public function __construct(){
         $date = new \DateTimeImmutable();
         $this->creatAt = new \DateTimeImmutable($date->format('Y-m-d'));
@@ -64,6 +68,18 @@ class Frais
     public function setCreatAt(\DateTimeImmutable $creatAt): static
     {
         $this->creatAt = $creatAt;
+
+        return $this;
+    }
+
+    public function getPoint(): ?Point
+    {
+        return $this->point;
+    }
+
+    public function setPoint(?Point $point): static
+    {
+        $this->point = $point;
 
         return $this;
     }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Admin;
 use App\Form\AdminFormType;
 use App\Repository\AdminRepository;
+use App\Repository\PointRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -28,11 +29,11 @@ class AdminController extends AbstractController
     public function index(AdminRepository $adminRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputUserFiltre")){
             $filtre['inputUserFiltre'] = $user = $session->get("inputUserFiltre");
             $session->remove("inputUserFiltre");
-        }       
+        }
         $admin = $adminRepository->findByFiltre($filtre);
         $pagination = $paginator->paginate(
             $admin, /* query NOT result */
@@ -47,7 +48,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/admin/save/{id?}', name: 'app_admin_save')]
-    public function save($id,UserRepository $userRepository,AdminRepository $adminRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,Session $session,PointRepository $pointRepository, UserRepository $userRepository,AdminRepository $adminRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $admin = new Admin();
@@ -61,9 +62,10 @@ class AdminController extends AbstractController
             $admin->setPassword($this->hasher->hashPassword(
                 $admin, 
                 $admin->getPassword()
-            )); 
-            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
-            $admin->setEntreprise($user->getEntreprise());
+            ));
+            foreach ($session->get('points') as $key => $value) {
+                $admin->addPoint($pointRepository->find($value));
+            }
             $manager->persist($admin);
             $manager->flush();
             $succes["addSucces"] = "admin ajouter avec succes";

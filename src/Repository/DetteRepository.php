@@ -38,8 +38,11 @@ class DetteRepository extends ServiceEntityRepository
 
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('d')           
-            ->orderBy('d.creatAt', 'DESC');
+        $query = $this->createQueryBuilder('d')
+            ->join('d.point','p')
+            ->orderBy('d.creatAt', 'DESC')
+            ->where('p.id = :point_id')
+            ->setParameter('point_id', $filtre['pointId']);
         if(!empty($filtre['dateFiltreDue'])){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['dateFiltreDue'].'%');
@@ -47,7 +50,7 @@ class DetteRepository extends ServiceEntityRepository
         if(!empty($filtre['dateFiltreClient'])){
             $query->andWhere('d.client like :client')
                     ->setParameter("client",'%'.$filtre['dateFiltreClient'].'%');
-        }  
+        }
         return $query->getQuery()
                     ->getResult();
 
@@ -55,15 +58,18 @@ class DetteRepository extends ServiceEntityRepository
     public function totalFiltre($filtre)
     {
         $query = $this->createQueryBuilder("d")
-                ->select('SUM(d.montantRestant)');
+                ->join('d.point','p')
+                ->select('SUM(d.montantRestant)')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
         if(!empty($filtre['dateFiltreDue'])){
             $query->andWhere('d.creatAt like :date')
-                    ->setParameter('date', '%'.$filtre['dateFiltreDue'].'%');
-        }   
+                ->setParameter('date', '%'.$filtre['dateFiltreDue'].'%');
+        }
         if(!empty($filtre['dateFiltreClient'])){
             $query->andWhere('d.client like :client')
-                    ->setParameter("client",'%'.$filtre['dateFiltreClient'].'%');
-        }   
+                ->setParameter("client",'%'.$filtre['dateFiltreClient'].'%');
+        }
         return $query->getQuery()
                     ->getSingleScalarResult();
 
@@ -72,15 +78,18 @@ class DetteRepository extends ServiceEntityRepository
     public function findTotalDate($filtre)
     {
         $query = $this ->createQueryBuilder("d")
-                ->select('SUM(d.montantTotal)');                       
+                ->join('d.point','p')
+                ->select('SUM(d.montantTotal)')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
         if(!empty($filtre['inputFiltredateVente'])){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['inputFiltredateVente'].'%');
-        } 
+        }
         return $query->getQuery()
                     ->getSingleScalarResult();
 
-    }    
+    }
 
         
 //    public function findOneBySomeField($value): ?Dette

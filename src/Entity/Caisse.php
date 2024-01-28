@@ -34,6 +34,10 @@ class Caisse
     #[ORM\Column]
     private ?float $benefice = null;
 
+    #[ORM\ManyToOne(inversedBy: 'caisse')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Point $point = null;
+
     public function __construct(){
         $date = new \DateTimeImmutable();
         $this->CreatAt = new \DateTimeImmutable($date->format('Y-m-d H:i'));
@@ -124,6 +128,18 @@ class Caisse
     public function setBenefice(float $benefice): static
     {
         $this->benefice = $benefice;
+
+        return $this;
+    }
+
+    public function getPoint(): ?Point
+    {
+        return $this->point;
+    }
+
+    public function setPoint(?Point $point): static
+    {
+        $this->point = $point;
 
         return $this;
     }

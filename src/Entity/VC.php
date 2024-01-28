@@ -37,7 +37,11 @@ class VC
     #[ORM\OneToMany(mappedBy: 'vC', targetEntity: DetailVC::class)]
     protected Collection $detailVc;
 
-    public function __construct(){        
+    #[ORM\ManyToOne(inversedBy: 'vc')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Point $point = null;
+
+    public function __construct(){
         $this->creatAt = new \DateTimeImmutable();
         $this->detailVc = new ArrayCollection();
     }
@@ -132,6 +136,18 @@ class VC
                 $detailVc->setVC(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPoint(): ?Point
+    {
+        return $this->point;
+    }
+
+    public function setPoint(?Point $point): static
+    {
+        $this->point = $point;
 
         return $this;
     }

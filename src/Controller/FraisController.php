@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Frais;
 use App\Form\FraisFormType;
 use App\Repository\FraisRepository;
+use App\Repository\PointRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,7 @@ class FraisController extends AbstractController
     public function index(FraisRepository $fraisRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("selectFiltreDate")){
             $filtre['selectFiltreDate'] = $DateJR = $session->get("selectFiltreDate");
         }else{
@@ -48,7 +49,7 @@ class FraisController extends AbstractController
     }
 
     #[Route('/frais/save/{id?}', name: 'app_frais_save')]
-    public function save($id,FraisRepository $fraisRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,PointRepository $pointRepository,Session $session,FraisRepository $fraisRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $frais = new Frais();
@@ -58,7 +59,8 @@ class FraisController extends AbstractController
         $form = $this->createForm(FraisFormType::class, $frais);
         $form->handleRequest($request);
         // dd($frais);
-        if ($form->isSubmitted() && $form->isValid()) {          ;
+        if ($form->isSubmitted() && $form->isValid()) { 
+            $frais->setPoint($pointRepository->find($session->get('pointActive')->getId()));
             $manager->persist($frais);
             $manager->flush();
             $succes["addSucces"] = "frais ajouter avec succes";
@@ -71,7 +73,7 @@ class FraisController extends AbstractController
 
     #[Route('/frais/filtre', name: 'app_frais_filtre')]
     public function filtre(Request $request,Session $session): Response
-    {        
+    {
         
         if($request->isXmlHttpRequest() || $request->query->get('attrdateJr-frais') != null){            
             $session->set("selectFiltreDate" , $request->query->get('attrdateJr-frais'));

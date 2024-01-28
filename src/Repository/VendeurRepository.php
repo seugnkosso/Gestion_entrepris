@@ -37,7 +37,10 @@ class VendeurRepository extends ServiceEntityRepository
 //    }
 public function findByFiltre($filtre): array
 {
-    $query = $this->createQueryBuilder('v');            
+    $query = $this->createQueryBuilder('v')                
+                ->join('v.points','p')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
 
     if(!empty($filtre['inputUserFiltre'])){
         $query->andWhere('v.nomComplet like :user or v.telephone like :user')

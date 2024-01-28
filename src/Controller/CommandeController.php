@@ -9,6 +9,7 @@ use App\Entity\DetailVC;
 use App\Repository\UserRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\CommandeRepository;
+use App\Repository\PointRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ class CommandeController extends AbstractController
     public function index(CommandeRepository $commandeRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputFiltredateVente")){
             $filtre['inputFiltredateVente'] = $date = $session->get("inputFiltredateVente");
         }else{
@@ -90,12 +91,13 @@ class CommandeController extends AbstractController
 
 // FAIRE LA COMMANDE ON 
     #[Route('/commande/DoVente', name: 'app_vendre_doCommande')]
-    public function doCommande(UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
+    public function doCommande(PointRepository $pointRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
     {        
             $produitpaniers = $session->get("produits");
             $session->remove("produits");
             $commande = new Commande();
-            $total = 0;       
+            $commande->setPoint($pointRepository->find($session->get('pointActive')->getId()));
+            $total = 0;
             foreach ($produitpaniers as $pn){
                 $prod = $produitRepository->find($pn->getId());            
                 // dd($prod->getQte()-$pn->getQte());
@@ -138,6 +140,8 @@ class CommandeController extends AbstractController
     public function venteImprime(CommandeRepository $commandeRepository,Request $request,Session $session): Response
     {       
         $filtre = $session->get("filtreCommande");
+        $filtre['pointId'] = $session->get('pointActive')->getId();
+
         $pagination = $commandeRepository->findByFiltre($filtre);
         $total = $commandeRepository->findByFiltreTotal($filtre);  
         return $this->render('commande/commandeImprime.html.twig', [
@@ -150,10 +154,11 @@ class CommandeController extends AbstractController
 
 // FAIRE LA VENTE ON 
     #[Route('/commande/valider/{id?}', name: 'app_commande_valider')]
-    public function validerCommande($id,CommandeRepository $commandeRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
+    public function validerCommande($id,PointRepository $pointRepository,CommandeRepository $commandeRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
     {        
             $commande = $commandeRepository->find($id)    ;
-            $vente = new Vente();            
+            $vente = new Vente(); 
+            $vente->setPoint($pointRepository->find($session->get('pointActive')->getId()));
             foreach ($commande->getDetailVc() as $pn){                                    
                 $detailVc = new DetailVC();
                 $detailVc->setQteVente($pn->getQteVente());

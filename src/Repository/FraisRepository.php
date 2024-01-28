@@ -38,9 +38,11 @@ class FraisRepository extends ServiceEntityRepository
 
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('f')           
-            ->orderBy('f.creatAt', 'DESC');
-            
+        $query = $this->createQueryBuilder('f')
+            ->join('f.point','p')
+            ->orderBy('f.creatAt', 'DESC')
+            ->where('p.id = :point_id')
+            ->setParameter('point_id', $filtre['pointId']);            
         if(!empty($filtre['selectFiltreDate'])){
             $query->andWhere('f.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['selectFiltreDate'].'%');
@@ -52,7 +54,10 @@ class FraisRepository extends ServiceEntityRepository
     public function totalFiltre($filtre)
     {
         $query = $this->createQueryBuilder("f")
-                ->select('SUM(f.montant)');
+                ->join('f.point','p')
+                ->select('SUM(f.montant)')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);                
         if(!empty($filtre['selectFiltreDate'])){
             $query->andWhere('f.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['selectFiltreDate'].'%');
@@ -64,25 +69,31 @@ class FraisRepository extends ServiceEntityRepository
 
          public function findTotalDate($filtre)
         {
-            $query = $this ->createQueryBuilder("f")
-                    ->select('SUM(f.montant)');                       
+            $query = $this ->createQueryBuilder("f")            
+                    ->join('f.point','p')
+                    ->select('SUM(f.montant)')
+                    ->where('p.id = :point_id')
+                    ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltredateVente'])){
                 $query->andWhere('f.creatAt like :date')
                         ->setParameter('date', '%'.$filtre['inputFiltredateVente'].'%');
-            } 
+            }
             return $query->getQuery()
                         ->getSingleScalarResult();
 
         }
 
-        public function findAllDay($date)
+        public function findAllDay($date,$idPoint)
         {
-            $query = $this->createQueryBuilder('f')
-                ->select("SUM(f.montant)")
-                ->where("f.creatAt like :date")
-                ->setParameter("date",'%'.$date.'%');
-                return $query->getQuery()
-                            ->getSingleScalarResult();
+            return $this->createQueryBuilder('f')            
+                    ->join('f.point','p')
+                    ->select("SUM(f.montant)")
+                    ->where('p.id = :point_id')
+                    ->setParameter('point_id', $idPoint)
+                    ->andwhere("f.creatAt like :date")
+                    ->setParameter("date",'%'.$date.'%')
+                    ->getQuery()
+                    ->getSingleScalarResult();
 
         }
 

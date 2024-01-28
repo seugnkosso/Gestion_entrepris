@@ -10,6 +10,7 @@ use App\Repository\CaisseRepository;
 use App\Repository\CommandeRepository;
 use App\Repository\DetteParVenteRepository;
 use App\Repository\PayementRepository;
+use App\Repository\PointRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ class CaisseController extends AbstractController
     public function index(CaisseRepository $caisseRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputFiltreCaisse")){
             $filtre['inputFiltreCaisse'] = $date = $session->get("inputFiltreCaisse");
         }
@@ -60,15 +61,15 @@ class CaisseController extends AbstractController
 
     // CLOTURE CAISSE ON 
         #[Route('/caisse/save', name: 'app_caisse_save')]
-        public function save(DetteParVenteRepository $detteParVenteRepository,DetteRepository $detteRepository,EntityManagerInterface $manager,CommandeRepository $commandeRepository,PayementRepository $payementRepository,FraisRepository $fraisRepository,VenteRepository $venteRepository): Response
+        public function save(Session $session,PointRepository $pointRepository,DetteParVenteRepository $detteParVenteRepository,DetteRepository $detteRepository,EntityManagerInterface $manager,CommandeRepository $commandeRepository,PayementRepository $payementRepository,FraisRepository $fraisRepository,VenteRepository $venteRepository): Response
         {
             $date = new \DateTimeImmutable();
             $caisse = new Caisse();
-            
-            $totalVente = $venteRepository->findAllDay($date->format('Y-m-d'));
+            $caisse->setPoint($pointRepository->find($session->get('pointActive')->getId()));
+            $totalVente = $venteRepository->findAllDay($date->format('Y-m-d'),$session->get('pointActive')->getId());
             $caisse->setTotalVente($totalVente??0);
             
-            $totalFrais = $fraisRepository->findAllDay($date->format('Y-m-d'));
+            $totalFrais = $fraisRepository->findAllDay($date->format('Y-m-d'),$session->get('pointActive')->getId());
             $caisse->setTotalFrais($totalFrais??0);
             
             $totalDettePayer = $payementRepository->findAllDayDette($date->format('Y-m-d'));        
@@ -78,13 +79,13 @@ class CaisseController extends AbstractController
             // dd($totalDusPayer);
             $caisse->setTotalDusPayer($totalDusPayer??0);
             
-            $totalCommande = $commandeRepository->findAllDay($date->format('Y-m-d'));        
-            $caisse->setTotalCommande($totalCommande??0);
+            $totalCommande = $commandeRepository->findAllDay($date->format('Y-m-d'),$session->get('pointActive'));
+            $caisse->setTotalCommande($totalCommande??0);            
 
-            $venteBenefice = $venteRepository->findTotalDate($date->format('Y-m-d'));
+            $venteBenefice = $venteRepository->findTotalDate($date->format('Y-m-d'),$session->get('pointActive')->getId());
             // $TotalDusNonPayer = $detteRepository->findTotalDate($date->format('Y-m-d'));
             
-            $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($date->format('Y-m-d'));
+            $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($date->format('Y-m-d'),$session->get('pointActive')->getId());
             $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais);
             // dd($detteBeneficeDay);
             $caisse->setBenefice($benefice);
@@ -99,7 +100,7 @@ class CaisseController extends AbstractController
         #[Route('/caisse/detail/ByDate/{date?}', name: 'app_caisse_detail_date')]
         public function detailDate($date,DetteRepository $detteRepository,EntityManagerInterface $manager,CommandeRepository $commandeRepository,PayementRepository $payementRepository,FraisRepository $fraisRepository,VenteRepository $venteRepository,CaisseRepository $caisseRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
         {                
-            $caisse = $caisseRepository->findByDate($date);
+            $caisse = $caisseRepository->findByDate($date,$session->get('pointActive')->getId());
             // dd($caisse);
             if(!empty($caisse)){
                 $totalCaisse = $caisse["totalVente"] + $caisse["totalDettePayer"] - $caisse["totalFrais"] - $caisse["TotalDusPayer"];       

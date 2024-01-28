@@ -37,8 +37,11 @@ class DetteParVenteRepository extends ServiceEntityRepository
 //    }
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('d')           
-            ->orderBy('d.creatAt', 'DESC');
+        $query = $this->createQueryBuilder('d')
+            ->join('d.point','p')
+            ->orderBy('d.creatAt', 'DESC')
+            ->where('p.id = :point_id')
+            ->setParameter('point_id', $filtre['pointId']);
         if(!empty($filtre['dateFiltreDue'])){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date','%'.$filtre['dateFiltreDue'].'%');
@@ -46,7 +49,7 @@ class DetteParVenteRepository extends ServiceEntityRepository
         if(!empty($filtre['dateFiltreClient'])){
             $query->andWhere('d.client like :client')
                     ->setParameter("client",'%'.$filtre['dateFiltreClient'].'%');
-        }  
+        }
         return $query->getQuery()
                     ->getResult();
 
@@ -55,7 +58,10 @@ class DetteParVenteRepository extends ServiceEntityRepository
     public function totalFiltre($filtre)
     {
         $query = $this->createQueryBuilder("d")
-                ->select('SUM(d.montantRestant)');
+                ->join('d.point','p')
+                ->select('SUM(d.montantRestant)')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
         if(!empty($filtre['dateFiltreDue'])){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date', '%'.$filtre['dateFiltreDue'].'%');
@@ -69,14 +75,17 @@ class DetteParVenteRepository extends ServiceEntityRepository
 
     }
 
-    public function findTotalDatedette($date)
+    public function findTotalDatedette($date,$idPoint)
     {
         $query = $this ->createQueryBuilder("d")
-                ->select('SUM(d.benefice)');                       
+                ->join('d.point','p')
+                ->select('SUM(d.benefice)')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $idPoint);
         if(!empty($date)){
             $query->andWhere('d.creatAt like :date')
                     ->setParameter('date', '%'.$date.'%');
-        } 
+        }
         return $query->getQuery()
                     ->getSingleScalarResult();
     }

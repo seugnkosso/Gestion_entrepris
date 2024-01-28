@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Vendeur;
 use App\Form\VendeurFormType;
+use App\Repository\PointRepository;
 use App\Repository\UserRepository;
 use App\Repository\VendeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,11 +28,13 @@ class VendeurController extends AbstractController
     public function index(VendeurRepository $vendeurRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
+         
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         
         if($session->has("inputUserFiltre")){
             $filtre['inputUserFiltre'] = $user = $session->get("inputUserFiltre");
             $session->remove("inputUserFiltre");
-        }  
+        }
                 
         $vendeur = $vendeurRepository->findByFiltre($filtre);
         $pagination = $paginator->paginate(
@@ -47,7 +50,7 @@ class VendeurController extends AbstractController
     }
 
     #[Route('/vendeur/save/{id?}', name: 'app_vendeur_save')]
-    public function save($id,UserRepository $userRepository,VendeurRepository $vendeurRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,PointRepository $pointRepository,Session $session,VendeurRepository $vendeurRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $vendeur = new Vendeur();
@@ -63,8 +66,7 @@ class VendeurController extends AbstractController
                 $vendeur, 
                 $vendeur->getPassword()
             ));
-            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
-            $vendeur->setEntreprise($user->getEntreprise());
+            $vendeur->addPoint($pointRepository->find($session->get('pointActive')));
             $manager->persist($vendeur);
             $manager->flush();
             $succes["addSucces"] = "vendeur ajouter avec succes";

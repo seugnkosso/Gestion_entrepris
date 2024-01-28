@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Superviseur;
 use App\Form\SuperviseurFormType;
+use App\Repository\PointRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SuperviseurRepository;
 use App\Repository\UserRepository;
@@ -27,7 +28,7 @@ class SuperviseurController extends AbstractController
     public function index(Session $session,PaginatorInterface $paginator,SuperviseurRepository $superviseurRepository,Request $request): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputUserFiltre")){
             $filtre['inputUserFiltre'] = $user = $session->get("inputUserFiltre");
             $session->remove("inputUserFiltre");
@@ -63,7 +64,7 @@ class SuperviseurController extends AbstractController
     }
 
     #[Route('/superviseur/save/{id?}', name: 'app_superviseur_save')]
-    public function save($id,UserRepository $userRepository,SuperviseurRepository $superviseurRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,PointRepository $pointRepository,Session $session,SuperviseurRepository $superviseurRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $superviseur = new Superviseur();
@@ -73,22 +74,21 @@ class SuperviseurController extends AbstractController
 
         $form = $this->createForm(SuperviseurFormType::class, $superviseur);
         $form->handleRequest($request);
-        // dd($superviseur);
-        if ($form->isSubmitted() && $form->isValid()) { 
+        
+        if ($form->isSubmitted() && $form->isValid()) {
             $superviseur->setPassword($this->hasher->hashPassword(
-                $superviseur, 
+                $superviseur,
                 $superviseur->getPassword()
             ));
-            $user = $userRepository->findOneBy(["email" => $this->getUser()->getUserIdentifier()]);
-            $superviseur->setEntreprise($user->getEntreprise());
+            $superviseur->addPoint($pointRepository->find($session->get('pointActive')));
             $manager->persist($superviseur);
             $manager->flush();
             $succes["addSucces"] = "superviseur ajouter avec succes";
 
         }
         return $this->render('superviseur/form.html.twig', [
-            "form" => $form->createView(),  
-            "succes" => $succes??null            
+            "form" => $form->createView(),
+            "succes" => $succes??null
 
         ]);
     }

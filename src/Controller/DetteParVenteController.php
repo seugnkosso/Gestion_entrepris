@@ -8,6 +8,7 @@ use App\Entity\Payement;
 use App\Entity\DetteParVente;
 use App\Repository\UserRepository;
 use App\Form\DetteParVenteFormType;
+use App\Repository\PointRepository;
 use App\Repository\VenteRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\PayementRepository;
@@ -30,9 +31,9 @@ class DetteParVenteController extends AbstractController
             $session->remove("idPay"); 
         }
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("dateFiltreDue")){
-            $filtre['dateFiltreDue'] = $date = $session->get("dateFiltreDue");            
+            $filtre['dateFiltreDue'] = $date = $session->get("dateFiltreDue");
         }
         
         if($session->has("dateFiltreClient")){
@@ -59,8 +60,8 @@ class DetteParVenteController extends AbstractController
 
     #[Route('/detteParVente/filtre', name: 'app_detteParVente_filtre')]
     public function filtre(Request $request,Session $session): Response
-    {        
-        if($request->isXmlHttpRequest() || $request->query->get('attrclient') != null){            
+    {
+        if($request->isXmlHttpRequest() || $request->query->get('attrclient') != null){
             $session->set("dateFiltreClient" , $request->query->get('attrclient'));
         }
 
@@ -80,12 +81,14 @@ class DetteParVenteController extends AbstractController
 
     // AJOUTER DETTE PAR VENTE ON 
         #[Route('/detteParVente/DoVente', name: 'app_vendre_dodetteParVente')]
-        public function dodetteParVente(UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
-        {        
+        public function dodetteParVente(PointRepository $pointRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
+        {
                 $produitpaniers = $session->get("produits");
                 $session->remove("produits");
                 $detteParVente = new DetteParVente();
+                $detteParVente->setPoint($pointRepository->find($session->get('pointActive')->getId()));
                 $vente = new Vente();
+                $vente->setPoint($pointRepository->find($session->get('pointActive')->getId()));
                 $total = 0;
                 $benefice = 0;       
                 foreach ($produitpaniers as $pn){

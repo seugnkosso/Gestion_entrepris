@@ -10,6 +10,7 @@ use App\Repository\DetteRepository;
 use App\Repository\DueRepository;
 use App\Repository\FraisRepository;
 use App\Repository\PayementRepository;
+use App\Repository\PointRepository;
 use App\Repository\VenteRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\UserRepository;
@@ -31,6 +32,8 @@ class VenteController extends AbstractController
     public function index(DetteParVenteRepository $detteParVenteRepository, DetteRepository $detteRepository,FraisRepository $fraisRepository,VenteRepository $venteRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
+
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         
         if($session->has("inputFiltredateVente")){
             $filtre['inputFiltredateVente'] = $date = $session->get("inputFiltredateVente");
@@ -59,11 +62,11 @@ class VenteController extends AbstractController
             10 /*limit per page*/
         );
         // BENEFICE VENTE ON                         
-            $totalFrais = $fraisRepository->findAllDay($filtre['inputFiltredateVente']);                                        
+            $totalFrais = $fraisRepository->findAllDay($filtre['inputFiltredateVente'],$session->get('pointActive')->getId());                                        
             $venteBenefice = $venteRepository->findTotalDate($filtre);
             // dd($venteBenefice);
             // $TotalDusNonPayer = $detteRepository->findTotalDate($filtre);            
-            $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($filtre['inputFiltredateVente']);
+            $detteBeneficeDay = $detteParVenteRepository->findTotalDatedette($filtre['inputFiltredateVente'],$session->get('pointActive')->getId());
             $benefice = ($venteBenefice + $detteBeneficeDay) - ($totalFrais);
         // BENEFICE VENTE OFF 
         return $this->render('vente/index.html.twig', [
@@ -109,7 +112,7 @@ class VenteController extends AbstractController
     public function vendre(ProduitRepository $produitRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputFiltreProduit")){
             $filtre['inputFiltreProduit'] = $session->get("inputFiltreProduit");
             $session->remove("inputFiltreProduit");
@@ -187,14 +190,15 @@ class VenteController extends AbstractController
 
 // FAIRE LA VENTE ON 
     #[Route('/vendre/DoVente', name: 'app_vendre_doVente')]
-    public function dovente(UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
+    public function dovente(PointRepository $pointRepository, UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
     {        
             $produitpaniers = $session->get("produits");
             $session->remove("produits");
             $vente = new Vente();
-            $total = 0;       
+            $vente->setPoint($pointRepository->find($session->get('pointActive')->getId()));
+            $total = 0;
             foreach ($produitpaniers as $pn){
-                $prod = $produitRepository->find($pn->getId());            
+                $prod = $produitRepository->find($pn->getId());
                 $produitRepository->updateQte($prod->getQte()-$pn->getQte(),$pn->getId());
                 $total += $pn->getPrixVenteFix() * $pn->getQte();
                 $detailVc = new DetailVC();
@@ -210,7 +214,7 @@ class VenteController extends AbstractController
             $vente->setTotal($total);
             $vente->setUser($user);
             $vente->setNumero("venteN°".$vente->getId().$vente->getCreatAt()->format('d-m-Y').$vente->getCreatAt()->format('H:i'));
-            $manager->persist($vente);        
+            $manager->persist($vente);
             $manager->flush();
             $succes["venteSucces"] = "vente réussi";
             $session->set("succes",$succes);
@@ -226,11 +230,11 @@ class VenteController extends AbstractController
             if($session->get("produits") != null){
                 $session->set("client",$request->request->get('client'));
                 if(!empty($request->request->get('vente'))){
-                    return  $this->redirectToRoute('app_vendre_doVente');;            
-                }elseif(!empty($request->request->get('dette'))){                    
-                    return  $this->redirectToRoute('app_vendre_dodetteParVente');;                        
+                    return  $this->redirectToRoute('app_vendre_doVente');
+                }elseif(!empty($request->request->get('dette'))){
+                    return  $this->redirectToRoute('app_vendre_dodetteParVente');
                 }else{
-                    return  $this->redirectToRoute('app_vendre_doCommande');;                        
+                    return  $this->redirectToRoute('app_vendre_doCommande');
                 }
             }else{
                 $errors["panierVide"] = "le panier est vide";
@@ -240,7 +244,7 @@ class VenteController extends AbstractController
             $errors["panierVide"] = "le panier est vide";
             $session->set("errors",$errors);
         }
-        return  $this->redirectToRoute('app_vendre');                             
+        return  $this->redirectToRoute('app_vendre');
     }
 // CHOISIR VENTE OU COMMANDE OFF 
 
@@ -275,11 +279,11 @@ class VenteController extends AbstractController
 // ANNULER VENTE  ON 
     #[Route('/vente/annuler/{id?}', name: 'app_vente_annuler')]
     public function annulerVente($id,VenteRepository $venteRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
-    {        
+    {
             $vente = $venteRepository->find($id);
             foreach ($vente->getDetailVc() as $pn){
-                $prod = $produitRepository->find($pn->getProduit()->getId());            
-                $produitRepository->updateQte($prod->getQte()+$pn->getQteVente(),$pn->getProduit()->getId());                                                 
+                $prod = $produitRepository->find($pn->getProduit()->getId());
+                $produitRepository->updateQte($prod->getQte()+$pn->getQteVente(),$pn->getProduit()->getId());
                 $manager->remove($pn);
             }     
             $manager->remove($vente);        

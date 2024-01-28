@@ -37,12 +37,15 @@ class SuperviseurRepository extends ServiceEntityRepository
 //    }
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('s');            
+        $query = $this->createQueryBuilder('s')
+                ->join('s.points','p')
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);           
 
         if(!empty($filtre['inputUserFiltre'])){
             $query->andWhere('s.nomComplet like :user or s.telephone like :user')
                     ->setParameter('user', '%'.$filtre['inputUserFiltre'].'%');
-        } 
+        }
         return $query->getQuery()
                     ->getResult();
 

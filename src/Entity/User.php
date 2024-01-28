@@ -51,14 +51,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Dette::class)]
     private Collection $dettes;
 
-    #[ORM\Column(length: 255)]
-    private ?string $entreprise = null;
+
+    #[ORM\ManyToMany(targetEntity: Point::class, mappedBy: 'user')]
+    private Collection $points;
 
     public function __construct()
     {
         $this->VC = new ArrayCollection();
         $this->detteParVentes = new ArrayCollection();
         $this->dettes = new ArrayCollection();
+        $this->points = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -257,14 +259,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEntreprise(): ?string
+    /**
+     * @return Collection<int, Point>
+     */
+    public function getPoints(): Collection
     {
-        return $this->entreprise;
+        return $this->points;
+    }
+    
+    public function addPoint(Point $point): static
+    {
+        if (!$this->points->contains($point)) {
+            $this->points->add($point);
+            $point->addUser($this);
+        }
+
+        return $this;
     }
 
-    public function setEntreprise(string $entreprise): static
+    public function removePoint(Point $point): static
     {
-        $this->entreprise = $entreprise;
+        if ($this->points->removeElement($point)) {
+            $point->removeUser($this);
+        }
 
         return $this;
     }

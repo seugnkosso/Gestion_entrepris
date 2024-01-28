@@ -10,6 +10,7 @@ use App\Form\DetteFormType;
 use App\Form\DetteFormpayType;
 use App\Repository\UserRepository;
 use App\Repository\DetteRepository;
+use App\Repository\PointRepository;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -35,7 +36,7 @@ class DetteController extends AbstractController
             $session->remove('produitsDette');
         }
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("dateFiltreDue")){
             $filtre['dateFiltreDue'] = $session->get("dateFiltreDue");
             $date = $session->get("dateFiltreDue");
@@ -64,7 +65,7 @@ class DetteController extends AbstractController
 
 // DETTE SAVE ON 
     #[Route('/due/save/{id?}', name: 'app_dette_save')]
-    public function save($id,UserRepository $userRepository, DetteRepository $detteRepository,Request $request,EntityManagerInterface $manager): Response
+    public function save($id,PointRepository $pointRepository,Session $session,UserRepository $userRepository, DetteRepository $detteRepository,Request $request,EntityManagerInterface $manager): Response
     {
         if($id == null){
             $dette = new Dette();
@@ -77,6 +78,7 @@ class DetteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $userRepository->findOneBy(["email"=>$this->getUser()->getUserIdentifier()]);
             $dette->setUser($user);
+            $dette->setPoint($pointRepository->find($session->get('pointActive')->getId()));
             $dette->setMontantRestant($dette->getMontantTotal()); 
             $dette->setMontantDonnee(0);           ;
             $manager->persist($dette);
@@ -166,7 +168,7 @@ class DetteController extends AbstractController
         }
 
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();        
         if($session->has("inputFiltreProduit")){
             $filtre['inputFiltreProduit'] = $session->get("inputFiltreProduit");
             $session->remove("inputFiltreProduit");
@@ -277,13 +279,14 @@ class DetteController extends AbstractController
 
 // FAIRE LA VENTE ON 
     #[Route('/due/doVente', name: 'app_dette_doVente')]
-    public function dovente(DetteRepository $detteRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
+    public function dovente(PointRepository $pointRepository,DetteRepository $detteRepository,UserRepository $userRepository,ProduitRepository $produitRepository,EntityManagerInterface $manager,Request $request,Session $session): Response
     {                   
         if($session->has("produitsDette")){
                 if($session->get("produitsDette") != null){
                     $produitpaniers = $session->get("produitsDette");
                     $session->remove("produitsDette");
                     $vente = new Vente();
+                    $vente->setPoint($pointRepository->find($session->get('pointActive')->getId()));
                     $total = 0;       
                     foreach ($produitpaniers as $pn){
                         $prod = $produitRepository->find($pn->getId());            
@@ -317,7 +320,7 @@ class DetteController extends AbstractController
     public function vendre(ProduitRepository $produitRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputFiltreProduit")){
             $filtre['inputFiltreProduit'] = $session->get("inputFiltreProduit");
             $session->remove("inputFiltreProduit");
@@ -325,7 +328,7 @@ class DetteController extends AbstractController
             $filtre['inputFiltreProduit'] = "null";
         }
                 
-        $produits = $produitRepository->findByFiltre($filtre);        
+        $produits = $produitRepository->findByFiltre($filtre);
         $pagination = $paginator->paginate(
             $produits, /* query NOT result */
             $request->query->getInt('page', 1), /*page number*/

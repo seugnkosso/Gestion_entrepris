@@ -38,26 +38,32 @@ class CaisseRepository extends ServiceEntityRepository
     public function findByFiltre($filtre): array
     {
         $query = $this->createQueryBuilder('c')
-                ->orderBy("c.CreatAt","DESC");           
+                ->join('c.point','p')
+                ->orderBy("c.CreatAt","DESC")
+                ->andwhere('p.id like :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
 
         if(!empty($filtre['inputFiltreCaisse'])){
             $query->andWhere('c.CreatAt like :date')
                     ->setParameter('date', '%'.$filtre['inputFiltreCaisse'].'%');
-        } 
+        }
         return $query->getQuery()
                     ->getResult();
     }
-   
-    public function findByDate($date): array
+
+    public function findByDate($date,$idPoint): array
     {
         $query = $this->createQueryBuilder('c')
-                ->select("SUM(c.TotalFrais) as totalFrais, SUM(c.totalVente) as totalVente, SUM(c.totalDettePayer) as totalDettePayer, SUM(c.TotalDusPayer) as TotalDusPayer, SUM(c.TotalCommande) as TotalCommande, SUM(c.benefice) as benefice");
+                ->join('c.point','p')
+                ->select("SUM(c.TotalFrais) as totalFrais, SUM(c.totalVente) as totalVente, SUM(c.totalDettePayer) as totalDettePayer, SUM(c.TotalDusPayer) as TotalDusPayer, SUM(c.TotalCommande) as TotalCommande, SUM(c.benefice) as benefice")
+                ->andwhere('p.id like :point_id')
+                ->setParameter('point_id', $idPoint);
                 if(!empty($date)){
                     $query->andWhere('c.CreatAt like :date')
                             ->setParameter('date', '%'.$date.'%');
                 }
-        return $query->getQuery()       
-                    ->getOneOrNullResult();                                 
+        return $query->getQuery()
+                    ->getOneOrNullResult();
     }
 //    public function findOneBySomeField($value): ?Caisse
 //    {

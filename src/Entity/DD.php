@@ -47,6 +47,10 @@ class DD
     #[ORM\Column(length: 10)]
     private ?string $typeDD = null;
 
+    #[ORM\ManyToOne(inversedBy: 'dd')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Point $point = null;
+
     public function __construct(){
         $date = new \DateTimeImmutable();
         $this->creatAt = new \DateTimeImmutable($date->format('Y-m-d'));
@@ -168,6 +172,18 @@ class DD
     public function setTypeDD(string $typeDD): static
     {
         $this->typeDD = $typeDD;
+
+        return $this;
+    }
+
+    public function getPoint(): ?Point
+    {
+        return $this->point;
+    }
+
+    public function setPoint(?Point $point): static
+    {
+        $this->point = $point;
 
         return $this;
     }

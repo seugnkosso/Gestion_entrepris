@@ -106,25 +106,17 @@
 }
 // CAISSE JS OFF
 
-
-
-// SECTEUR JS ON 
-{    
-    const selectFiltreChef =document.querySelector('#select-filtre-chef');
-    if(selectFiltreChef){
-        selectFiltreChef.addEventListener("change",(event)=>{
-            SelectFiltreAsynchrone(event,selectFiltreChef);
-        })
-    }
-    
-    const selectFiltreDirection =document.querySelector('#select-filtre-direction');
-    if(selectFiltreDirection){
-        selectFiltreDirection.addEventListener("change",(event)=>{
-            SelectFiltreAsynchrone(event,selectFiltreDirection);
+// POINT JS ON 
+{
+    const selectPoint = document.querySelector('#selectPoint');
+    if(selectPoint){
+        selectPoint.addEventListener("change",(event)=>{
+            SelectFiltreAsynchrone(event,selectPoint);
         })
     }
 }
-// SECTEUR JS OFF
+// POINT JS ON 
+
 function SelectFiltreAsynchrone(event,select){
     const option=event.target.options[select.selectedIndex];
     const path=option.getAttribute('data-path')  

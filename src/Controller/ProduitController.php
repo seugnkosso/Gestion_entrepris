@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Produit;
 use SimpleExcel\SimpleExcel;
 use App\Form\ProduitFormType;
+use App\Repository\PointRepository;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -22,11 +23,11 @@ class ProduitController extends AbstractController
     public function index(ProduitRepository $produitRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("inputFiltreProduit")){
             $filtre['inputFiltreProduit'] = $prod = $session->get("inputFiltreProduit");
             $session->remove("inputFiltreProduit");
-        }        
+        }
         $produit = $produitRepository->findByFiltre($filtre);
         $pagination = $paginator->paginate(
             $produit, /* query NOT result */
@@ -50,28 +51,28 @@ class ProduitController extends AbstractController
     {
 
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("qteFiltreExiste")){
-            $filtre['qteFiltreExiste'] = $qteFiltreExiste =  $session->get("qteFiltreExiste");            
+            $filtre['qteFiltreExiste'] = $qteFiltreExiste =  $session->get("qteFiltreExiste");
         }   
         if($session->has("qteFiltreManque")){
-            $filtre['qteFiltreManque'] = $qteFiltreManque =  $session->get("qteFiltreManque");            
+            $filtre['qteFiltreManque'] = $qteFiltreManque =  $session->get("qteFiltreManque");
             // dd($qteFiltreManque);
         }
         $produit = $produitRepository->findByFiltre($filtre);
         if($request->query->get("imprimer")){
             $excel = new SimpleExcel('csv');
 
-            $excel->writer->addRow(array('id', 'detail', 'qte', 'prix_achat', 'prix_vente_fix', 'prix_vente_min', 'categorie')); // insert more record
-            foreach ($produit as $key => $value) {            
-                $excel->writer->addRow(array($value->getId(), $value->getDetail(), $value->getQte(), $value->getPrixAchat(), $value->getPrixVenteFix(), $value->getPrixventeMin(), $value->getCategorie())); // insert more record
+            $excel->writer->addRow(['id', 'detail', 'qte', 'prix_achat', 'prix_vente_fix', 'prix_vente_min', 'categorie']); // insert more record
+            foreach ($produit as $key => $value) {
+                $excel->writer->addRow([$value->getId(),$value->detail,$value->getQte(),$value->getPrixAchat(),$value->getPrixVenteFix(),$value->getPrixventeMin(),$value->getCategorie()]); // insert more record
             }
             if($session->has("qteFiltreExiste")){
-                $name = "produit reel";
-            }else if($session->has("qteFiltreManque")){                
-                $name = "produit manquant";
+                $name = "produit reel ".$session->get("pointActive")->getLibelle();
+            }else if($session->has("qteFiltreManque")){
+                $name = "produit manquant ".$session->get("pointActive")->getLibelle();
             }else{
-                $name = "All produit";
+                $name = "All produit ".$session->get("pointActive")->getLibelle();
             }
             $excel->writer->saveFile($name);
         }
@@ -84,14 +85,14 @@ class ProduitController extends AbstractController
     }
 
     #[Route('/produit/saveExcel', name: 'app_produit_save_excel')]
-    public function saveExcel(ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
+    public function saveExcel(PointRepository $pointRepository,ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
     {
 
-        try {            
+        try {
             $excel = new SimpleExcel('CSV');
-            $excel->parser->loadFile('C:/xampp/htdocs/Gestion_entrepris/stock/All produit.csv');
+            $excel->parser->loadFile('C:/xampp/htdocs/Gestion_entrepris/stock/All produit '.$session->get("pointActive")->getLibelle().'.csv');
     
-            // récupération de tous les produit du excel         
+            // récupération de tous les produit du excel
             $AllProduits = $excel->parser->getAllRow();
     
             foreach ($AllProduits as $key => $value) {
@@ -102,15 +103,15 @@ class ProduitController extends AbstractController
                         $produit = new Produit();
                     }
                     $produit->setDetail($prod[1]);
-                    $produit->setQte($prod[2]);
-                    $produit->setPrixAchat($prod[3]);
-                    $produit->setPrixVenteFix($prod[4]);
-                    $produit->setPrixventeMin($prod[5]);
-                    $produit->setCategorie($prod[6]);
-                    // dd($produit);
-                    $manager->persist($produit);            
-                }        
-            }                            
+                    $produit->setQte((int)$prod[2]);
+                    $produit->setPrixAchat((float)$prod[3]);
+                    $produit->setPrixVenteFix((float)$prod[4]);
+                    $produit->setPrixventeMin((float)$prod[5]);
+                    $produit->setCategorie((string)$prod[6]);
+                    $produit->setPoint($pointRepository->find($session->get('pointActive')->getId()));
+                    $manager->persist($produit);
+                }
+            }
             $manager->flush();
             $succes = "stock mis a jour";
         } catch (\Throwable $th) {
@@ -120,7 +121,7 @@ class ProduitController extends AbstractController
         return $this->redirectToRoute("app_produit");
     }
     #[Route('/produit/save/{id?}', name: 'app_produit_save')]
-    public function save($id,ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
+    public function save($id,PointRepository $pointRepository,ProduitRepository $produitRepository,Request $request,EntityManagerInterface $manager,Session $session): Response
     {
         if($id == null){
             $produit = new Produit();
@@ -133,9 +134,10 @@ class ProduitController extends AbstractController
         // dd($produit);
         if ($form->isSubmitted() && $form->isValid()) {
             if($id != null){
-                $produit->setQte($produit->getQte()+$session->get("qte"));                
-            }            
-            $manager->persist($produit);                
+                $produit->setQte($produit->getQte()+$session->get("qte"));
+            }
+            $produit->setPoint($pointRepository->find($session->get('pointActive')->getId()));
+            $manager->persist($produit);
             $manager->flush();
             $succes["addSucces"] = "produit ajouter avec succes";
         }
@@ -147,12 +149,13 @@ class ProduitController extends AbstractController
 
     #[Route('/produit/filtre', name: 'app_produit_filtre')]
     public function filtre(Request $request,Session $session): Response
-    {        
+    {
         if($request->isXmlHttpRequest() || $request->query->get('attrproduit') != null){            
             $session->set("inputFiltreProduit" , $request->query->get('attrproduit'));
         }
         return new JsonResponse($this->generateUrl("app_produit"));
     }
+    
     #[Route('/produit/filtre/all', name: 'app_produit_filtre_all')]
     public function filtreAll(Request $request,Session $session): Response
     {        

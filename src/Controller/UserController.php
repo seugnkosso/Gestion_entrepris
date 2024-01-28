@@ -18,14 +18,14 @@ class UserController extends AbstractController
     public function index(UserRepository $userRepository,PaginatorInterface $paginator,Request $request,Session $session): Response
     {
         $filtre = [];
-        
+        $filtre['pointId'] = $session->get('pointActive')->getId();
         if($session->has("selectFiltreDate")){
             $filtre['selectFiltreDate'] = $DateJR = $session->get("selectFiltreDate");
         }else{
             $d = new \DateTimeImmutable();
             $session->set("selectFiltreDate",$d->format("Y-m-d"));
             $filtre['selectFiltreDate'] = $DateJR = $session->get("selectFiltreDate");
-        }        
+        }
         $user = $userRepository->findByFiltre($filtre);
         $pagination = $paginator->paginate(
             $user, /* query NOT result */

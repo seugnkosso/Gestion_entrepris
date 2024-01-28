@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -55,17 +56,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 //    }
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('u');            
+        $query = $this->createQueryBuilder('u')
+                ->join('u.point','p')
+                ->andWhere('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
+
 
         // if(!empty($filtre['selectFiltreDate'])){
         //     $query->andWhere('f.creatAt like :date')
         //             ->setParameter('date', '%'.$filtre['selectFiltreDate'].'%');
-        // } 
+        // }
 
         return $query->getQuery()
                     ->getResult();
 
     }
+    public function findByUser(Session $session): array
+    {
+        return $this->createQueryBuilder('u')
+                ->join('u.point','p')
+                ->andWhere('p.id = :point_id')
+                ->setParameter('point_id', $session->get('pointActive')->getId())
+                ->getQuery()
+                ->getResult();
+    }
+    
 //    public function findOneBySomeField($value): ?User
 //    {
 //        return $this->createQueryBuilder('u')

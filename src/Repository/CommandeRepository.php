@@ -38,8 +38,10 @@ class CommandeRepository extends ServiceEntityRepository
         public function findByFiltre($filtre): array
         {
             $query = $this->createQueryBuilder('c')
-                    ->orderBy("c.creatAt","DESC");           
-
+                    ->join('c.point','p')
+                    ->orderBy("c.creatAt","DESC")                    
+                    ->andwhere('p.id like :point_id')
+                    ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltreClientVente'])){
                 $query->andWhere('c.client like :client')
                         ->setParameter('client', '%'.$filtre['inputFiltreClientVente'].'%');
@@ -61,7 +63,10 @@ class CommandeRepository extends ServiceEntityRepository
         public function findByFiltreTotal($filtre)
         {
             $query = $this ->createQueryBuilder("c")
-                    ->select('SUM(c.total)');            
+                    ->join('c.point','p')
+                    ->select('SUM(c.total)')
+                    ->andwhere('p.id like :point_id')
+                    ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltreClientVente'])){
                 $query->andWhere('c.client like :client')
                         ->setParameter('client', '%'.$filtre['inputFiltreClientVente'].'%');
@@ -81,15 +86,17 @@ class CommandeRepository extends ServiceEntityRepository
 
         }
 
-        public function findAllDay($date)
+        public function findAllDay($date,$idPoint)
         {
             $query = $this->createQueryBuilder('c')
+                ->join('c.point','p')
                 ->select("SUM(c.total)")
                 ->where("c.creatAt like :date")
-                ->setParameter("date",'%'.$date.'%');
+                ->setParameter("date",'%'.$date.'%')
+                ->andwhere('p.id like :point_id')
+                ->setParameter('point_id', $idPoint);
                 return $query->getQuery()
                             ->getSingleScalarResult();
-
         }
 //    public function findOneBySomeField($value): ?Commande
 //    {

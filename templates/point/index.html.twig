@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Caisse{% endblock %}
+
+{% block content %}
+{# FORM FILTRE ON #}
+    {# <div class="w-full p-4 bg-gray-200">
+        <div class="flex items-center w-full gap-3">
+            <div class="w-1/3">
+                <input data-path="{{path('app_caisse_filtre')}}" placeholder="yyyy-mm-dd" class="w-full" type="text" value="{{date??""}}" name="" id="date_caisse">
+            </div>						
+            <div class="w-2/3">
+                <a onClick="return confirm('voulez vous vraiment cloturer la journée')" href="{{path('app_caisse_save')}}" class="float-right p-2 bg-yellow-400 rounded-md">cloturer la journée</a>
+            </div>							
+        </div>
+    </div> #}
+{# FORM FILTRE OFF #}
+{# TABLE ON  #}
+    <div class="m-4 overflow-x-auto bg-white dark:bg-neutral-700">
+
+        <!-- Table -->
+        <table class="min-w-full text-xs text-left whitespace-nowrap">
+
+            <!-- Table head -->
+            <thead class="tracking-wider uppercase border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
+                <tr>
+                                            
+                    <th scope="col" class="px-6 py-5 text-letf ">
+                        Point de vente
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table body -->
+            <tbody>
+                {% for item in pagination %}
+                    <tr class="text-base border-b dark:border-neutral-600">                        
+                        <td class="px-6 py-5">{{item.libelle}}</td>
+                    </tr>
+                {% endfor %}     
+            </tbody>
+        </table>
+    </div>
+{# TABLE OFF  #}
+    <div class="text-right">
+        <a class="p-2 px-4 bg-red-400 rounded-sm" href="{{path('app_point_save')}}">ajouter</a>
+    </div>        
+
+{# KPN PAGINATION ON  #}
+	<div class="py-2 text-center">		
+			{{ knp_pagination_render(pagination) }}		
+	</div>
+{# KPN PAGINATION OFF #}
+{% endblock %}

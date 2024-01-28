@@ -37,8 +37,11 @@ class ProduitRepository extends ServiceEntityRepository
 //    }
     public function findByFiltre($filtre): array
     {
-        $query = $this->createQueryBuilder('p')           
-            ->orderBy('p.qte', 'DESC');
+        $query = $this->createQueryBuilder('p')
+                ->join('p.point','po')
+                ->orderBy('p.qte', 'DESC')
+                ->andwhere('po.id like :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
             
         if(!empty($filtre['qteFiltreManque'])){
             $query->andWhere('p.qte < :qteFiltreManque')
@@ -60,8 +63,11 @@ class ProduitRepository extends ServiceEntityRepository
     public function findByFiltreVente($filtre): array
     {
         $query = $this->createQueryBuilder('p')           
+            ->join('p.point','po')
             ->orderBy('p.qte', 'DESC')
-            ->where("p.qte > 0");
+            ->where("p.qte > 0")
+            ->andwhere('po.id like :point_id')
+            ->setParameter('point_id', $filtre['pointId']);
             
         if(!empty($filtre['qteFiltreManque'])){
             $query->andWhere('p.qte < :qteFiltreManque')

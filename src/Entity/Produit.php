@@ -16,8 +16,8 @@ class Produit
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255,unique: true)]
-    private ?string $detail = null;
+    #[ORM\Column(length: 50)]
+    public ?string $detail = null;
 
     #[ORM\Column]
     private ?int $qte = null;
@@ -36,6 +36,10 @@ class Produit
 
     #[ORM\OneToMany(mappedBy: 'produit', targetEntity: DetailVC::class)]
     private Collection $detailVc;
+
+    #[ORM\ManyToOne(inversedBy: 'produit')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Point $point = null;
 
     public function __construct()
     {
@@ -145,6 +149,18 @@ class Produit
                 $detailVc->setProduit(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPoint(): ?Point
+    {
+        return $this->point;
+    }
+
+    public function setPoint(?Point $point): static
+    {
+        $this->point = $point;
 
         return $this;
     }

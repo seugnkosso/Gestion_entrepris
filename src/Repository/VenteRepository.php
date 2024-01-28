@@ -39,32 +39,36 @@ class VenteRepository extends ServiceEntityRepository
         public function findByFiltre($filtre): array
         {
             $query = $this->createQueryBuilder('v')
+                ->join('v.point','p')
                 ->OrderBy("v.creatAt","DESC")
-                ->where("v.total > 0");
-                
-
+                ->where("v.total > 0")
+                ->andWhere('p.id = :point_id')
+                ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltreClientVente'])){
                 $query->andWhere('v.client like :client')
                         ->setParameter('client', '%'.$filtre['inputFiltreClientVente'].'%');
-            } 
+            }
             if(!empty($filtre['inputFiltreUserVente'])){
                 $query->join("v.user", "u")
                         ->andWhere('u.nomComplet like :users or u.telephone like :users or u.email like :users')
                         ->setParameter('users', '%'.$filtre['inputFiltreUserVente'].'%');
-            } 
+            }
 
             if(!empty($filtre['inputFiltredateVente'])){
                 $query->andWhere('v.creatAt like :date')
                         ->setParameter('date', '%'.$filtre['inputFiltredateVente'].'%');
-            } 
+            }
             return $query->getQuery()
                         ->getResult();
 
         }
-        public function findAllDay($date)
+        public function findAllDay($date,$idPoint)
         {
             $query = $this->createQueryBuilder('v')
+                ->join('v.point','p')
                 ->select("SUM(v.total)")
+                ->where('p.id = :point_id')
+                ->setParameter('point_id', $idPoint)
                 ->where("v.creatAt like :date")
                 ->setParameter("date",'%'.$date.'%');
                 return $query->getQuery()
@@ -75,8 +79,11 @@ class VenteRepository extends ServiceEntityRepository
         public function findByFiltreTotal($filtre)
         {
             $query = $this ->createQueryBuilder("v")
+                    ->join('v.point','p')
                     ->select('SUM(v.total)')
-                    ->where("v.total > 0");           
+                    ->andWhere("v.total > 0")
+                    ->andwhere('p.id like :point_id')
+                    ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltreClientVente'])){
                 $query->andWhere('v.client like :client')
                         ->setParameter('client', '%'.$filtre['inputFiltreClientVente'].'%');
@@ -99,10 +106,13 @@ class VenteRepository extends ServiceEntityRepository
         public function findTotalDate($filtre)
         {
             $query = $this ->createQueryBuilder("v")
-                    ->join("v.detailVc", "d")                                       
-                    ->join("d.produit", "p")                                       
+                    ->join("v.detailVc", "d")
+                    ->join("d.produit", "p")
+                    ->join('v.point','po')
                     ->select('SUM(d.prixVente * d.qteVente) - SUM(p.prixAchat * d.qteVente)')
-                    ->where("v.total > 0");                   
+                    ->where("v.total > 0")
+                    ->andwhere('po.id = :point_id')
+                    ->setParameter('point_id', $filtre['pointId']);
             if(!empty($filtre['inputFiltredateVente'])){
                 $query->andWhere('v.creatAt like :date')
                         ->setParameter('date', '%'.$filtre['inputFiltredateVente'].'%');

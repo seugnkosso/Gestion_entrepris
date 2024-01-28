@@ -13,7 +13,7 @@
 
             <div class="w-2/3">
                 <a href="{{path('app_frais_save')}}" class="float-right p-2 bg-yellow-400 rounded-md">nouveau</a>
-            </div>			
+            </div>
         </div>
     </div>
 {# FORM FILTRE OFF #}
@@ -51,8 +51,8 @@
                         <td class="px-6 py-5">{{item.montant}}</td>                       
                         <td class="px-6 py-5">
                             <a target="_blank" href="{{path('app_frais_save',{id:item.id})}}" class="p-2 bg-yellow-400 rounded">modifier</a>
-                        </td>                    
-                    </tr>                
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
 
