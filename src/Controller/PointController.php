@@ -43,9 +43,13 @@ class PointController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $point->addUser($this->getUser());
-            $manager->persist($point);
-            $manager->flush();
-            $succes["addSucces"] = "point ajouter avec succes";
+            try {
+                $manager->persist($point);
+                $manager->flush();
+                $succes["addSucces"] = "point de vente ajouter avec succes";                
+            } catch (\Throwable $th) {
+                $succes["addSucces"] = "point de vente existe deja";
+            }
         }
         return $this->render('point/form.html.twig', [
             "form" => $form->createView(),
