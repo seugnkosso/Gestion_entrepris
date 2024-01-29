@@ -28,6 +28,10 @@
                     <th scope="col" class="px-6 py-5 text-letf ">
                         Point de vente
                     </th>
+                    <th scope="col" class="px-6 py-5 text-letf ">
+                        action
+                    </th>
+                    
                 </tr>
             </thead>
 
@@ -36,6 +40,7 @@
                 {% for item in pagination %}
                     <tr class="text-base border-b dark:border-neutral-600">                        
                         <td class="px-6 py-5">{{item.libelle}}</td>
+                        <td class="px-6 py-5 text-right"><a class="p-2 px-4 bg-red-400 rounded-sm" href="{{path('app_point_save',{id:item.id})}}" >modifier</a></td>
                     </tr>
                 {% endfor %}     
             </tbody>
@@ -43,7 +48,7 @@
     </div>
 {# TABLE OFF  #}
     <div class="text-right">
-        <a class="p-2 px-4 bg-red-400 rounded-sm" href="{{path('app_point_save')}}">ajouter</a>
+        <a class="p-2 px-4 mt-4 bg-red-400 rounded-sm " href="{{path('app_point_save')}}">ajouter</a>
     </div>        
 
 {# KPN PAGINATION ON  #}
