@@ -18,9 +18,19 @@ class ProduitFormType extends AbstractType
             ->add('categorie',TextType::class)
             ->add('detail',TextType::class)
             ->add('qte',IntegerType::class)
-            ->add('prixAchat',NumberType::class)
+            ->add('prixAchat',NumberType::class,[
+                    'attr' => [
+                        'class' => 'prixAchatInput w-full',
+                    ]
+                ]
+
+            )
             ->add('prixVenteFix',NumberType::class)
-            ->add('prixVenteMin',NumberType::class)
+            ->add('prixVenteMin',NumberType::class,[
+                'attr' => [
+                    'class' => 'prixVenteMinInput w-full',
+                ]
+            ])
         ;
     }
 

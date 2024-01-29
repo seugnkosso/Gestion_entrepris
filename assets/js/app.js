@@ -117,6 +117,20 @@
 }
 // POINT JS ON 
 
+// FORMULAIRE DE PRODUITS JS ON 
+{
+    const inputPrixAchat = document.querySelector('.prixAchatInput');
+    const inputPrixVenteMin = document.querySelector('.prixVenteMinInput');
+    console.log(inputPrixAchat)
+    if(inputPrixAchat){
+        inputPrixAchat.addEventListener('keyup',() =>{
+                inputPrixVenteMin.value = parseFloat(inputPrixAchat.value) + parseFloat(inputPrixAchat.value * 20 / 100);
+            }
+        )
+    }
+}
+// FORMULAIRE DE PRODUITS JS ON 
+
 function SelectFiltreAsynchrone(event,select){
     const option=event.target.options[select.selectedIndex];
     const path=option.getAttribute('data-path')  
