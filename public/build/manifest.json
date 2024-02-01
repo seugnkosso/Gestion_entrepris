@@ -4,10 +4,6 @@
   "build/runtime.js": "/build/runtime.js",
   "build/vendors-node_modules_tw-elements_dist_js_chart_es_js.js": "/build/vendors-node_modules_tw-elements_dist_js_chart_es_js.js",
   "build/vendors-node_modules_tw-elements_dist_js_chartjs-plugin-datalabels_es_js.js": "/build/vendors-node_modules_tw-elements_dist_js_chartjs-plugin-datalabels_es_js.js",
-  "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-fed336.css": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-fed336.css",
-  "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-fed336.js": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-fed336.js",
-  "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-23064b.css": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-23064b.css",
-  "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-23064b.js": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-23064b.js",
   "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-c8a5b4.css": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-c8a5b4.css",
   "build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-c8a5b4.js": "/build/vendors-node_modules_select2_dist_js_select2_js-node_modules_select2_dist_css_select2_css-nod-c8a5b4.js"
 }
