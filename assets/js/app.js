@@ -121,7 +121,6 @@
 {
     const inputPrixAchat = document.querySelector('.prixAchatInput');
     const inputPrixVenteMin = document.querySelector('.prixVenteMinInput');
-    console.log(inputPrixAchat)
     if(inputPrixAchat){
         inputPrixAchat.addEventListener('keyup',() =>{
                 inputPrixVenteMin.value = parseFloat(inputPrixAchat.value) + parseFloat(inputPrixAchat.value * 20 / 100);
